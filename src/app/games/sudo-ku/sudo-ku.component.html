@@ -1,0 +1,25 @@
+<div id="container">
+    <div id="sidebar">
+        <div id="rules">
+            <h1>Rules:</h1>
+            <h3> The aim of the game is to fill each square with a number from 1 - 9. Each number can only appear once
+                in
+                the
+                same row, column or 3 x 3 box. When ready just click KILL IT.
+                Note:To delete a number just select on the box and press 0.
+            </h3>
+
+        </div>
+        <ul>
+            <li (click)='showDetails()'><span id='rulesBtn'>HIDE RULES</span></li>
+            <li (click)='getLevel()'><span>GENERATE LEVEL</span></li>
+            <li (click)='submitLevel()'><span>SUBMIT LEVEL</span></li>
+            <li (click)='check()'><span>KILL IT</span></li>
+        </ul>
+    </div>
+    <table id="chessboard" (keypress)='handleKeyboardEvent($event)'>
+        <tr *ngFor="let tr of game;index as trInd">
+            <td align="center" *ngFor="let td of tr;index as tdInd" #box (click)="markBox(trInd,tdInd,box)">{{td}}</td>
+        </tr>
+    </table>
+</div>
