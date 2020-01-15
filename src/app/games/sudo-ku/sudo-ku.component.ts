@@ -1,6 +1,8 @@
 import { Component, OnInit, HostListener } from "@angular/core";
 import { ICell } from "./interfaces/cell";
 import { ICellLocation } from "./interfaces/CellLocation";
+import { MatDialog } from "@angular/material/dialog";
+import { Rules } from "./popups/rules/rules-component";
 
 @Component({
   selector: "app-sudo-ku",
@@ -137,10 +139,9 @@ export class SudoKuComponent implements OnInit {
     ]
   ];
 
-  constructor() {}
+  constructor(public dialog: MatDialog) {}
 
   ngOnInit() {
-    this.showDetails();
   }
 
   //ADDING NUMBER
@@ -183,17 +184,11 @@ export class SudoKuComponent implements OnInit {
 
   //DETAILS
 
-  showDetails() {
-    const rules = () => document.getElementById("rules");
-    const btn = () => document.getElementById("rulesBtn");
-    if (btn().textContent === "SHOW RULES") {
-      btn().textContent = "HIDE RULES";
-      rules().style.display = "block";
-    } else {
-      btn().textContent = "SHOW RULES";
-      rules().style.display = "none";
+    showDetails(): void {
+      const dialogRef = this.dialog.open(Rules, {
+      });
     }
-  }
+  
 
   //GENERATE LEVEL
 
