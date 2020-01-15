@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from "@angular/core";
-import { Box } from "./interfaces/box";
-import { getRandGame } from "./games";
+import { ICell } from "./interfaces/cell";
+import { ICellLocation } from "./interfaces/CellLocation";
 
 @Component({
   selector: "app-sudo-ku",
@@ -8,7 +8,19 @@ import { getRandGame } from "./games";
   styleUrls: ["./sudo-ku.component.css"]
 })
 export class SudoKuComponent implements OnInit {
-  private game: Array<number | string[]> = [
+  private game: Array<Array<ICell>> = [
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}]
+  ];
+
+  private values: Array<string[] | number[]> = [
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""],
@@ -19,31 +31,111 @@ export class SudoKuComponent implements OnInit {
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""]
   ];
-
-  private currentBox: Box = {
-    boxRef: "",
-    columnInd: 0,
-    rowInd: 0
-  };
-
-  @HostListener("document:keypress", ["$event"])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    const key = +event.key;
-    const box = this.currentBox;
-
-    if (key > 0 && key < 10) {
-      if (box.boxRef) {
-        this.game[box.rowInd][box.columnInd] = String(key);
-      }
-    }
-
-    if (key === 0) {
-      if (this.currentBox.boxRef) {
-        this.game[box.rowInd][box.columnInd] = "";
-      }
-    }
-    this.currentBox.boxRef.removeAttribute("style");
-  }
+  
+  private markedBox: ICellLocation = {};
+  private games: Array<Array<Array<ICell>>> = [
+    [
+      [
+        { value: 5, static: true },
+        { value: 3, static: true },
+        {},
+        {},
+        { value: 7, static: true },
+        {},
+        {},
+        {},
+        {}
+      ],
+      [
+        { value: 6, static: true },
+        {},
+        {},
+        { value: 1, static: true },
+        { value: 9, static: true },
+        { value: 5, static: true },
+        {},
+        {},
+        {}
+      ],
+      [
+        { value: 2, static: true },
+        {},
+        { value: 1, static: true },
+        {},
+        { value: 3, static: true },
+        {},
+        { value: 6, static: true },
+        {},
+        {}
+      ],
+      [
+        {},
+        {},
+        {},
+        { value: 8, static: true },
+        {},
+        { value: 4, static: true },
+        {},
+        {},
+        { value: 4, static: true }
+      ],
+      [
+        { value: 8, static: true },
+        {},
+        { value: 9, static: true },
+        {},
+        {},
+        {},
+        { value: 1, static: true },
+        {},
+        { value: 6, static: true }
+      ],
+      [
+        {},
+        { value: 6, static: true },
+        {},
+        {},
+        {},
+        {},
+        {},
+        { value: 5, static: true },
+        {}
+      ],
+      [
+        {},
+        {},
+        {},
+        { value: 5, static: true },
+        {},
+        { value: 9, static: true },
+        {},
+        {},
+        {}
+      ],
+      [
+        { value: 9, static: true },
+        {},
+        { value: 4, static: true },
+        {},
+        { value: 8, static: true },
+        {},
+        { value: 7, static: true },
+        {},
+        { value: 5, static: true }
+      ],
+      [
+        { value: 6, static: true },
+        {},
+        {},
+        { value: 1, static: true },
+        {},
+        { value: 7, static: true },
+        {},
+        {},
+        { value: 3, static: true }
+      ]
+    ]
+  ];
 
   constructor() {}
 
@@ -51,19 +143,122 @@ export class SudoKuComponent implements OnInit {
     this.showDetails();
   }
 
-  getLevel() {
-    this.game = getRandGame();
+  //ADDING NUMBER
+
+  markBox(trI: number, tdI: number, cell: ICell) {
+    if (this.markedBox.columnId) {
+      this.game[this.markedBox.rowId][this.markedBox.columnId].marked = false;
+    }
+    if (!cell.static) {
+      this.game[trI][tdI].marked = true;
+      this.markedBox.rowId = trI;
+      this.markedBox.columnId = tdI;
+    }
   }
 
-  submitLevel() {
-    console.log(this.game);
+  @HostListener("document:keypress", ["$event"])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    const key = +event.key;
+    if (key >= 0 && key < 10) {
+      if (this.markedBox.hasOwnProperty("rowId")) {
+        const box = this.game[this.markedBox.rowId][this.markedBox.columnId];
+
+        if (key === 0) {
+          box.value = "";
+          this.values[this.markedBox.rowId][this.markedBox.columnId] = '';
+        } else {
+          box.value = String(key);
+          this.values[this.markedBox.rowId][this.markedBox.columnId] = String(
+            key
+          );
+        }
+
+        box.marked = false;
+        this.game[this.markedBox.rowId][this.markedBox.columnId] = box;
+        delete this.markedBox.columnId;
+        delete this.markedBox.rowId;
+      }
+    }
   }
+
+  //DETAILS
+
+  showDetails() {
+    const rules = () => document.getElementById("rules");
+    const btn = () => document.getElementById("rulesBtn");
+    if (btn().textContent === "SHOW RULES") {
+      btn().textContent = "HIDE RULES";
+      rules().style.display = "block";
+    } else {
+      btn().textContent = "SHOW RULES";
+      rules().style.display = "none";
+    }
+  }
+
+  //GENERATE LEVEL
+
+  getLevel() {
+    const received = this.getRandomGame();
+    this.game = received;
+    const valuesOnly = received.map(arr =>
+      arr.map(cell => (cell.value ? cell.value : ""))
+    );
+    (this.values as any) = valuesOnly;
+  }
+
+  getRandomGame(): Array<Array<ICell>> {
+    const id = getRandomIntInclusive(0, this.games.length - 1);
+    const game = this.games[id];
+
+    return game;
+
+    function getRandomIntInclusive(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+  }
+
+  //SUBMIT
+
+  submitLevel() {
+    const game: Array<Array<ICell>> = this.game;
+
+    game.forEach(row => {
+      row.map(cell => cell.static === true);
+    });
+    console.log(game);
+
+    if (!this.games.includes(game)) {
+      this.games.push(game);
+    }
+
+    this.clear();
+  }
+
+  //CLEAR
+
+  clear() {
+    this.game = [
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}],
+      [{}, {}, {}, {}, {}, {}, {}, {}, {}]
+    ];
+  }
+
+  //KILL IT
 
   check() {
     let isReady: boolean = true;
     let isDone: boolean = true;
 
-    for (let row of this.game) {
+    for (let row of this.values) {
       if ((row as string[]).includes("")) {
         isReady = false;
         isDone = false;
@@ -71,9 +266,10 @@ export class SudoKuComponent implements OnInit {
         alert("You are not done yet!");
       }
     }
+
     //checking rows
     if (isReady) {
-      for (let row of this.game) {
+      for (let row of this.values) {
         const a = new Set(row as string[]);
         if (a.size !== (row as string[]).length) {
           isReady = false;
@@ -89,8 +285,8 @@ export class SudoKuComponent implements OnInit {
         const arr: string[] = [];
 
         for (let j = 0; j < 9; j++) {
-          const el = this.game[i][j];
-          arr.push(el);
+          const el = this.values[i][j];
+          arr.push(el as any);
         }
 
         isReady = new Set(arr as string[]).size === (arr as string[]).length;
@@ -108,18 +304,18 @@ export class SudoKuComponent implements OnInit {
           const arr3: string[] = [];
 
           for (let j = 0; j < 3; j++) {
-            const el = this.game[i][j];
-            arr1.push(el);
+            const el = this.values[i][j];
+            arr1.push(el as any);
           }
 
           for (let j = 3; j < 6; j++) {
-            const el = this.game[i][j];
-            arr2.push(el);
+            const el = this.values[i][j];
+            arr2.push(el as any);
           }
 
           for (let j = 6; j < 9; j++) {
-            const el = this.game[i][j];
-            arr3.push(el);
+            const el = this.values[i][j];
+            arr3.push(el as any);
           }
 
           isReady =
@@ -137,25 +333,6 @@ export class SudoKuComponent implements OnInit {
       alert("You killed it man/ma'am");
     } else if (isDone) {
       alert("You have a mistake!");
-    }
-  }
-
-  markBox(trI, tdI, box) {
-    this.currentBox["rowInd"] = trI;
-    this.currentBox["columnInd"] = tdI;
-    this.currentBox["boxRef"] = box;
-    box.style.backgroundColor = "skyblue";
-  }
-
-  showDetails() {
-    const rules = () => document.getElementById("rules");
-    const btn = () => document.getElementById("rulesBtn");
-    if (btn().textContent === "SHOW RULES") {
-      btn().textContent = "HIDE RULES";
-      rules().style.display = "block";
-    } else {
-      btn().textContent = "SHOW RULES";
-      rules().style.display = "none";
     }
   }
 }
