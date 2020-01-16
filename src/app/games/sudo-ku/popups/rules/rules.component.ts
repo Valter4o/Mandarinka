@@ -9,7 +9,7 @@ export class Rules {
   constructor(
     public dialogRef: MatDialogRef<Rules>,
   ) {} 
-
+ 
   onNoClick(): void {
     this.dialogRef.close();
   }

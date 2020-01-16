@@ -1,11 +1,26 @@
 <h1 mat-dialog-title>Rules:</h1>
 <div mat-dialog-content>
-  <h3> The aim of the game is to fill each square with a number from 1 - 9. Each number can only appear once
-    in
-    the
-    same row, column or 3 x 3 box. When ready just click KILL IT.
-    Note:To delete a number just select on the box and press 0.
-</h3>
+  <h3>
+    Put numbers from 1 to 9 without duplicate:
+    <br>
+    - each row
+    <br>
+    - each column
+    <br>
+    - each 3×3 section.
+    <br>
+    Click on the cell and use your keyboard to type in the numbers.
+    <h1 mat-dialog-title>Buttons:</h1>
+    Generate Level: Puts a random level.
+    <br>
+    Submit Level: This button submits you custom level.
+    <br>
+    Clear Board: Clears all cells(including the fixed ones).
+    <br>
+    Kill it: Checks if you made it all right.
+    <br>
+    <h5>Note: To delete the content of a cell press 0.</h5>
+  </h3>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Ok Thanks</button>
