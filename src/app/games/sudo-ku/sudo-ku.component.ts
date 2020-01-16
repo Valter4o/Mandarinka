@@ -2,7 +2,10 @@ import { Component, OnInit, HostListener } from "@angular/core";
 import { ICell } from "./interfaces/cell";
 import { ICellLocation } from "./interfaces/CellLocation";
 import { MatDialog } from "@angular/material/dialog";
-import { Rules } from "./popups/rules/rules-component";
+import { Rules } from "./popups/rules/rules.component";
+import { NotfinishedComponent } from "./popups/game/notfinished/notfinished.component";
+import { WonComponent } from './popups/game/finished/won/won.component';
+import { LostComponent } from './popups/game/finished/lost/lost.component';
 
 @Component({
   selector: "app-sudo-ku",
@@ -33,7 +36,7 @@ export class SudoKuComponent implements OnInit {
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""]
   ];
-  
+
   private markedBox: ICellLocation = {};
   private games: Array<Array<Array<ICell>>> = [
     [
@@ -139,7 +142,7 @@ export class SudoKuComponent implements OnInit {
     ]
   ];
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog) { }
 
   ngOnInit() {
   }
@@ -184,11 +187,10 @@ export class SudoKuComponent implements OnInit {
 
   //DETAILS
 
-    showDetails(): void {
-      const dialogRef = this.dialog.open(Rules, {
-      });
-    }
-  
+  showDetails(): void {
+    const dialogRef = this.dialog.open(Rules, {});
+  }
+
 
   //GENERATE LEVEL
 
@@ -258,7 +260,8 @@ export class SudoKuComponent implements OnInit {
         isReady = false;
         isDone = false;
 
-        alert("You are not done yet!");
+        this.dialog.open(NotfinishedComponent, {});
+        break;
       }
     }
 
@@ -325,9 +328,9 @@ export class SudoKuComponent implements OnInit {
     }
 
     if (isReady && isDone) {
-      alert("You killed it man/ma'am");
+      this.dialog.open(WonComponent, {});
     } else if (isDone) {
-      alert("You have a mistake!");
+      this.dialog.open(LostComponent, {});
     }
   }
 }
