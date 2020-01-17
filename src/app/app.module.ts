@@ -25,11 +25,13 @@ import { RegisterComponent } from './auth/register/register.component';
 
 import { ReactiveFormsModule,FormsModule } from "@angular/forms";
 import { FlexLayoutModule } from "@angular/flex-layout";
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
+import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 
 
 
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent],
+  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent],
   imports: [
     AngularMaterialModule,
     ReactiveFormsModule,

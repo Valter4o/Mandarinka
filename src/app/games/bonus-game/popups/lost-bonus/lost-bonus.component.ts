@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 
 
@@ -7,7 +7,7 @@ import { MatDialogRef } from "@angular/material/dialog";
   templateUrl: './lost-bonus.component.html',
   styleUrls: ['./lost-bonus.component.css']
 })
-export class LostBonusComponent implements OnInit {
+export class LostBonusComponent {
   
   constructor(
     public dialogRef: MatDialogRef<LostBonusComponent>
