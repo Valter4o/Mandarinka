@@ -145,6 +145,7 @@ export class SudoKuComponent implements OnInit {
   constructor(public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.showDetails();
   }
 
   //ADDING NUMBER

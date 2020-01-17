@@ -1,14 +1,7 @@
 <div id='container'>
     <div id='slidebar'>
-        <div id='description'>
-            <h1>BONUS GAME: Horse Counter</h1>
-            <h3>Rules:</h3>
-                <h4>1. You may start from any box.</h4>
-                <h4>2. You can move only like the horse in chess (on the red boxes).</h4>
-                <h4>3. Your goal is to fill the board.</h4>
-        </div>
         <ul>
-            <li (click)='rulesHandler()'><span id='descrBtn'>HIDE RULES</span></li>
+            <li (click)='rulesHandler()'><span id='descrBtn'>SHOW RULES</span></li>
             <li (click)='undo()'><span>UNDO</span></li>
             <li (click)='refresh()'><span>REFRESH</span></li>
         </ul>

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { RulesComponent } from './popups/rules/rules.component';
+import { MatDialog } from "@angular/material/dialog";
+import { LostBonusComponent } from './popups/lost-bonus/lost-bonus.component';
 
 @Component({
   selector: 'app-bonus-game',
@@ -12,21 +15,14 @@ export class BonusGameComponent implements OnInit {
   history: string[] = [];
   nextBoxes: string[] = [];
 
-  constructor() { }
+  constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.rulesHandler();
   }
 
   rulesHandler() {
-    const btn = () => document.getElementById('descrBtn');
-    if (btn().textContent === 'HIDE RULES') {
-      btn().textContent='SHOW RULES';
-      document.getElementById('description').style.display='none';
-    }else{
-      btn().textContent='HIDE RULES';
-      document.getElementById('description').style.display='block';
-    }
+    const dialogRef = this.dialog.open(RulesComponent);
   }
 
   addNum(e, letter, num) {
@@ -45,8 +41,16 @@ export class BonusGameComponent implements OnInit {
 
         this.history.push(letter + num);
         if (this.nextBoxes.length === 0) {
-          alert('You lost, noob!');
-          this.refresh();
+          const dialogRef = this.dialog.open(LostBonusComponent);
+          const sub = dialogRef.componentInstance.onClose.subscribe((type) => {
+            if (type === 'refresh') {
+              this.refresh();
+              this.dialog.closeAll();
+            } else if (type === 'undo') {
+              this.undo()
+              this.dialog.closeAll();
+            }
+          });
         }
       }
     }
