@@ -14,10 +14,11 @@ export class NavbarComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public router: Router,
-  ) { }
+  ) {
+    this.user = JSON.parse(localStorage.user);
+  }
 
   ngOnInit() {
-    this.user=JSON.parse(localStorage.user);
   }
 
   logout() {

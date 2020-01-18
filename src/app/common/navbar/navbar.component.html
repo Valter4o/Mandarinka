@@ -3,19 +3,19 @@
   <div>
 
   </div>
-  <span class="nav-tool-items">
-    <div  *ngIf="user">
+  <span class="nav-tool-items items">
+    <div *ngIf="user" class='btns'>
       <span>
-      Hello <a href="user/:id">{{user.displayName}}</a>
+        Hello <a href="user/:id">{{user.username || user.displayName}}</a>
       </span>
       <a mat-button href="sudoku">Sudo-ku</a>
       <a mat-button href="bonus">Bonus game</a>
       <a mat-button href="battleships">Battle ships</a>
       <a mat-button (click)="logout()">Log Out</a>
     </div>
-    <div *ngIf="!user">
-      <a mat-button mat-raised-button href="login" routerLinkActive="active">Log in</a>
-      <a mat-button mat-raised-button href="register" routerLinkActive="active">Register</a>
+    <div *ngIf="!user" class='authBtns'>
+      <a mat-button mat-raised-button href="login">Log in</a>
+      <a mat-button mat-raised-button class='registerBtn' href="register">Register</a>
     </div>
   </span>
-</mat-toolbar> 
+</mat-toolbar>

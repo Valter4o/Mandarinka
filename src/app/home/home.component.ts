@@ -9,16 +9,18 @@ import { User } from '../auth/user/services/iuser';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  user:User
+  user: User;
 
   constructor(
     public authService: AuthService,
     public router: Router,
     public ngZone: NgZone,
-  ) { }
+  ) { 
+
+    this.user = JSON.parse(localStorage.user);
+  }
 
   ngOnInit() {
-    this.user=localStorage.user;
   }
 
 }
