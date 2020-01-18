@@ -1,4 +1,4 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 
 
@@ -13,7 +13,7 @@ export class LostBonusComponent {
     public dialogRef: MatDialogRef<LostBonusComponent>
   ) { }
 
-  onClose = new EventEmitter();
+ onClose:EventEmitter<any> = new EventEmitter();
 
   undo() {
     this.onClose.emit('undo');

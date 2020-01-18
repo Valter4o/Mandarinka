@@ -1,13 +1,21 @@
 <mat-toolbar color="primary" class="app-header">
-  <div><a href="home"  class="positronx">Mandarinka</a></div>
+  <div><a href="home" class="positronx">Mandarinka</a></div>
   <div>
-    
+
   </div>
   <span class="nav-tool-items">
-    <a mat-button href="sudoku">Sudo-ku</a>
-    <a mat-button href="bonus">Bonus game</a>
-    <a mat-button href="battleships">Battle ships</a>
-    <a mat-button mat-raised-button href="login" routerLinkActive="active">Log in</a>
-    <a mat-button mat-raised-button href="register" routerLinkActive="active">Register</a>
+    <div  *ngIf="user">
+      <span>
+      Hello <a href="user/:id">{{user.displayName}}</a>
+      </span>
+      <a mat-button href="sudoku">Sudo-ku</a>
+      <a mat-button href="bonus">Bonus game</a>
+      <a mat-button href="battleships">Battle ships</a>
+      <a mat-button (click)="logout()">Log Out</a>
+    </div>
+    <div *ngIf="!user">
+      <a mat-button mat-raised-button href="login" routerLinkActive="active">Log in</a>
+      <a mat-button mat-raised-button href="register" routerLinkActive="active">Register</a>
+    </div>
   </span>
-</mat-toolbar>
+</mat-toolbar> 

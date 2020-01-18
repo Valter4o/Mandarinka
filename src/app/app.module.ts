@@ -16,7 +16,7 @@ import { AppComponent } from "./app.component";
 
 import { NavbarComponent } from "./common/navbar/navbar.component";
 import { FooterComponent } from "./common/footer/footer.component";
-import { HomeComponent } from "./common/home/home.component";
+import { HomeComponent } from "./home/home.component";
 
 import { GamesModule } from "./games/games.module";
 
