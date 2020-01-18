@@ -28,10 +28,15 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 
+import { AuthService } from "./auth/authentication.service";
+import { AngularFirestore } from "@angular/fire/firestore";
+import { AngularFireAuth } from "@angular/fire/auth";
+import { ErrorComponent } from './auth/popups/error/error.component';
+
 
 
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent],
+  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent, ErrorComponent],
   imports: [
     AngularMaterialModule,
     ReactiveFormsModule,
@@ -44,7 +49,7 @@ import { VerifyEmailComponent } from './auth/verify-email/verify-email.component
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule
   ],
-  providers: [],
+  providers: [AuthService,AngularFirestore,AngularFireAuth],
   bootstrap: [AppComponent],
   schemas:[CUSTOM_ELEMENTS_SCHEMA]
 })
