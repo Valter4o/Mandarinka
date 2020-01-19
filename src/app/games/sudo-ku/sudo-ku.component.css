@@ -4,6 +4,18 @@
   background-image: url('./images/title.png');
 }
 
+div#chessboard {
+  margin-left: 200px;
+}
+
+h3 {
+  margin-left: 200px;
+}
+
+#creatorSpan {
+  font-style: italic;
+}
+
 table#chessboard {
   margin: 20px auto;
   background: white;

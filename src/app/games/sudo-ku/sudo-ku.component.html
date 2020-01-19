@@ -2,18 +2,22 @@
     <div id="sidebar">
         <ul>
             <li (click)='showDetails()'><span>SHOW RULES</span></li>
-            <li (click)='getLevel()'><span>GENERATE LEVEL</span></li>
+            <li (click)='getRandomGame()'><span>GENERATE LEVEL</span></li>
             <li (click)='submitLevel()'><span>SUBMIT LEVEL</span></li>
             <li (click)='clear()'><span>CLEAR BOARD</span></li>
             <li (click)='check()'><span>KILL IT</span></li>
         </ul>
     </div>
-    <table id="chessboard" (keypress)='handleKeyboardEvent($event)'>
-        <tr *ngFor="let tr of game;index as trInd">
+    <div id="chessboard">
+        <h3 *ngIf='creator'>Creator: <span id='creatorSpan'>{{creator}}</span></h3>
+        <table id="chessboard" (keypress)='handleKeyboardEvent($event)'>
+            <tr *ngFor="let tr of game;index as trInd">
 
-            <td align="center" *ngFor="let td of tr;index as tdInd"
-                [ngClass]=" { 'static':td.static ,'marked':td.marked}" (click)="markBox(trInd,tdInd,td)">
-                {{td.value}}</td>
-        </tr>
-    </table>
+                <td align="center" *ngFor="let td of tr;index as tdInd"
+                    [ngClass]=" { 'static':td.static ,'marked':td.marked}" (click)="markBox(trInd,tdInd,td)">
+                    {{td.value}}</td>
+            </tr>
+        </table>
+
+    </div>
 </div>
