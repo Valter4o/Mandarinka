@@ -6,6 +6,7 @@ import { Rules } from "./popups/rules/rules.component";
 import { NotfinishedComponent } from "./popups/game/notfinished/notfinished.component";
 import { WonComponent } from './popups/game/finished/won/won.component';
 import { LostComponent } from './popups/game/finished/lost/lost.component';
+import { SudokuServiceService } from "../services/sudoku-service.service";
 
 @Component({
   selector: "app-sudo-ku",
@@ -24,7 +25,6 @@ export class SudoKuComponent implements OnInit {
     [{}, {}, {}, {}, {}, {}, {}, {}, {}],
     [{}, {}, {}, {}, {}, {}, {}, {}, {}]
   ];
-
   private values: Array<string[] | number[]> = [
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""],
@@ -36,113 +36,15 @@ export class SudoKuComponent implements OnInit {
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""]
   ];
-
   private markedBox: ICellLocation = {};
-  private games: Array<Array<Array<ICell>>> = [
-    [
-      [
-        { value: 5, static: true },
-        { value: 3, static: true },
-        {},
-        {},
-        { value: 7, static: true },
-        {},
-        {},
-        {},
-        {}
-      ],
-      [
-        { value: 6, static: true },
-        {},
-        {},
-        { value: 1, static: true },
-        { value: 9, static: true },
-        { value: 5, static: true },
-        {},
-        {},
-        {}
-      ],
-      [
-        { value: 2, static: true },
-        {},
-        { value: 1, static: true },
-        {},
-        { value: 3, static: true },
-        {},
-        { value: 6, static: true },
-        {},
-        {}
-      ],
-      [
-        {},
-        {},
-        {},
-        { value: 8, static: true },
-        {},
-        { value: 4, static: true },
-        {},
-        {},
-        { value: 4, static: true }
-      ],
-      [
-        { value: 8, static: true },
-        {},
-        { value: 9, static: true },
-        {},
-        {},
-        {},
-        { value: 1, static: true },
-        {},
-        { value: 6, static: true }
-      ],
-      [
-        {},
-        { value: 6, static: true },
-        {},
-        {},
-        {},
-        {},
-        {},
-        { value: 5, static: true },
-        {}
-      ],
-      [
-        {},
-        {},
-        {},
-        { value: 5, static: true },
-        {},
-        { value: 9, static: true },
-        {},
-        {},
-        {}
-      ],
-      [
-        { value: 9, static: true },
-        {},
-        { value: 4, static: true },
-        {},
-        { value: 8, static: true },
-        {},
-        { value: 7, static: true },
-        {},
-        { value: 5, static: true }
-      ],
-      [
-        { value: 6, static: true },
-        {},
-        {},
-        { value: 1, static: true },
-        {},
-        { value: 7, static: true },
-        {},
-        {},
-        { value: 3, static: true }
-      ]
-    ]
-  ];
+  public creator: string;
+  private gameDbId: string;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(
+    public dialog: MatDialog,
+    private service: SudokuServiceService
+  ) {
+  }
 
   ngOnInit() {
     this.showDetails();
@@ -205,10 +107,23 @@ export class SudoKuComponent implements OnInit {
   }
 
   getRandomGame(): Array<Array<ICell>> {
-    const id = getRandomIntInclusive(0, this.games.length - 1);
-    const game = this.games[id];
 
-    return game;
+    this.service.getGame().subscribe(data => {
+      const id = getRandomIntInclusive(0, data.length - 1);
+      const gameData: any = data[id].payload.doc.data();
+      const game: Array<Array<ICell>> = JSON.parse(gameData.game);
+      const dbGameId = data[id].payload.doc.id;
+      const username = gameData.username;
+      this.creator = username;
+
+      if (dbGameId === this.gameDbId) {
+        this.getRandomGame();
+      } else {
+        this.game = game;
+        this.gameDbId = dbGameId;
+      }
+    })
+    return;
 
     function getRandomIntInclusive(min, max) {
       min = Math.ceil(min);
@@ -223,13 +138,10 @@ export class SudoKuComponent implements OnInit {
     const game: Array<Array<ICell>> = this.game;
 
     game.forEach(row => {
-      row.map(cell => cell.static === true);
+      row.map(cell => cell.value ? cell.static = true : cell);
     });
-    console.log(game);
 
-    if (!this.games.includes(game)) {
-      this.games.push(game);
-    }
+    this.service.postGame(game, 'Valter')
 
     this.clear();
   }
@@ -237,6 +149,7 @@ export class SudoKuComponent implements OnInit {
   //CLEAR
 
   clear() {
+    this.creator = '';
     this.game = [
       [{}, {}, {}, {}, {}, {}, {}, {}, {}],
       [{}, {}, {}, {}, {}, {}, {}, {}, {}],
