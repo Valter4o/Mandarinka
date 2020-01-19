@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RulesComponent } from './popups/rules/rules.component';
 import { MatDialog } from "@angular/material/dialog";
 import { LostBonusComponent } from './popups/lost-bonus/lost-bonus.component';
+import { WonBonusComponent } from './popups/won-bonus/won-bonus.component';
 
 @Component({
   selector: 'app-bonus-game',
@@ -22,7 +23,7 @@ export class BonusGameComponent implements OnInit {
   }
 
   rulesHandler() {
-    const dialogRef = this.dialog.open(RulesComponent);
+    this.dialog.open(RulesComponent);
   }
 
   addNum(e, letter, num) {
@@ -40,6 +41,11 @@ export class BonusGameComponent implements OnInit {
         this.markNext(next);
 
         this.history.push(letter + num);
+        
+        if (this.counter === 100) {
+          this.dialog.open(WonBonusComponent)
+        }
+
         if (this.nextBoxes.length === 0) {
           const dialogRef = this.dialog.open(LostBonusComponent);
           const sub = dialogRef.componentInstance.onClose.subscribe((type) => {
