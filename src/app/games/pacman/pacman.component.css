@@ -1,0 +1,71 @@
+.main-container {
+    
+}
+
+.game-section {
+    outline: dotted rebeccapurple;
+    text-align: center;
+}
+
+.block {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    margin: -2px -2px -2px 2px;
+    /* background-color: rgba(119, 13, 13, 0.926); brown */
+    background-color: black;
+}
+
+.pacman {
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    
+}
+
+.coin {
+    background-image: url('./images/images/coin.png');
+    background-size: 25% 25%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.bonus-coin {
+    background-image: url('./images/images/coin.png');
+    background-size: 60% 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.wall {
+    background-image: url('./images/images/wall.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.road {
+    background-size: 100% 100%;
+}
+
+.ghost-pink {
+    background-image: url('./images/images/ghost_pink.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ghost-blue {
+    background-image: url('./images/images/ghost_blue.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ghost-orange {
+    background-image: url('./images/images/ghost_orange.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ghost-red {
+    background-image: url('./images/images/life_red.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}

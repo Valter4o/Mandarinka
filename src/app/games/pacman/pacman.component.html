@@ -1,1 +1,35 @@
-<p>pacman works!</p>
+<div class="main-container">
+    <section class="game-section">
+      <div class="row" *ngFor=" let row of gameMap; let i = index ">
+        <div class="block" *ngFor=" let block of row; let j = index " [ngClass]="{
+            'pacman' : block === 5,
+            'wall' : block === 0,
+            'coin' : block === 1,
+            'road' : block === 2,
+            'bonus-coin' : block === 4,
+            'ghost-pink' : block === 3
+          }" [ngStyle]="
+            {'background-image': block === 5 ? (
+              pacmanMove === 1 ? 'url('+'./images/images/pacman-up.png'+')' : (
+                pacmanMove === 2 ? 'url('+'./images/images/pacman-right.png'+')' : (
+                  pacmanMove === 3 ? 'url('+'./images/images/pacman-down.png'+')' : (
+                    pacmanMove === 4 ? 'url('+'./images/images/pacman-left.png'+')' : (
+                      pacmanMove === 5 ? 'url('+'./images/gifs/pacman-eating.gif'+')' : ''
+                    )
+                  )
+                )
+              )
+            ) : '' 
+          }"></div>
+      </div>
+    </section>
+  </div>
+  <h1>Total Score {{totalScore}}</h1>
+  <!-- 
+    0 ==> Wall
+    1 ==> Small coin
+    2 ==> Road
+    4 ==> Big coin
+    3 ==> Ghost
+    // 1 ==> up, 2==>right, 3==>down, 4==>left , 5==>eating a gif
+   -->
