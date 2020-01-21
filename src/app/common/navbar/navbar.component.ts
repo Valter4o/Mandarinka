@@ -18,13 +18,15 @@ export class NavbarComponent implements OnInit {
     this.user = JSON.parse(localStorage.user);
   }
 
+  ngDoCheck(): void {
+    this.user = JSON.parse(localStorage.user);
+  }
   ngOnInit() {
   }
 
   logout() {
-    this.authService.SignOut().then((res) => {
+    this.authService.SignOut().then(() => {  
       this.router.navigate(['home']);
-      location.reload();
     }).catch((err) => {
       //TODO
       alert(err.message)

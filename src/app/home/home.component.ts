@@ -15,8 +15,7 @@ export class HomeComponent implements OnInit {
     public authService: AuthService,
     public router: Router,
     public ngZone: NgZone,
-  ) { 
-
+  ) {
     this.user = JSON.parse(localStorage.user);
   }
 
