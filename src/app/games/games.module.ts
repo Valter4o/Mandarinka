@@ -19,13 +19,18 @@ import { LostComponent } from './sudo-ku/popups/game/finished/lost/lost.componen
 import { RulesComponent } from './bonus-game/popups/rules/rules.component';
 import { LostBonusComponent } from './bonus-game/popups/lost-bonus/lost-bonus.component';
 import { WonBonusComponent } from './bonus-game/popups/won-bonus/won-bonus.component';
+import { PrebattleComponent } from './battle-ships/prebattle/prebattle.component';
+
+//CDK module
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { PacmanComponent } from './pacman/pacman.component';
 
 
 @NgModule({
-  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent],
-    
-    imports: [CommonModule,MatDialogModule,MatButtonModule],
-  entryComponents: [LostComponent,RulesComponent,Rules,NotfinishedComponent,WonComponent,LostComponent,LostBonusComponent,WonBonusComponent],
+  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent],
+
+  imports: [CommonModule, MatDialogModule, MatButtonModule, DragDropModule],
+  entryComponents: [LostComponent, RulesComponent, Rules, NotfinishedComponent, WonComponent, LostComponent, LostBonusComponent, WonBonusComponent],
   exports: [BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent]
 })
 export class GamesModule { }
