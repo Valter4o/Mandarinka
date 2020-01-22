@@ -19,6 +19,10 @@ export class HomeComponent implements OnInit {
     this.user = JSON.parse(localStorage.user);
   }
 
+  ngDoCheck(): void {
+    this.user = JSON.parse(localStorage.user);
+  }
+
   ngOnInit() {
   }
 

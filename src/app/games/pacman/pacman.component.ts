@@ -59,6 +59,7 @@ export class PacmanComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   controlKeyboardEvent(event) {
+    event.preventDefault();
 
     if (event.keyCode == 37) {
       //Left Arrow Key < (20,8)

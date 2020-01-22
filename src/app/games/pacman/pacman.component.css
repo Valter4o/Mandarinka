@@ -17,6 +17,7 @@
 }
 
 .pacman {
+    background-image: url(./images/images/pacman-left.png);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     

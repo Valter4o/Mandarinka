@@ -52,7 +52,7 @@ export class SudoKuComponent implements OnInit {
 
   //ADDING NUMBER
 
-  markBox(trI: number, tdI: number, cell: ICell) {
+  markBox(trI: number, tdI: number, cell: ICell): void {
     if (this.markedBox.columnId) {
       this.game[this.markedBox.rowId][this.markedBox.columnId].marked = false;
     }
@@ -64,7 +64,7 @@ export class SudoKuComponent implements OnInit {
   }
 
   @HostListener("document:keypress", ["$event"])
-  handleKeyboardEvent(event: KeyboardEvent) {
+  handleKeyboardEvent(event: KeyboardEvent): void {
     const key = +event.key;
     if (key >= 0 && key < 10) {
       if (this.markedBox.hasOwnProperty("rowId")) {
@@ -91,22 +91,24 @@ export class SudoKuComponent implements OnInit {
   //DETAILS
 
   showDetails(): void {
-    const dialogRef = this.dialog.open(Rules, {});
+    this.dialog.open(Rules, {});
   }
 
 
   //GENERATE LEVEL
 
-  getLevel() {
-    const received = this.getRandomGame();
+  getLevel(): void {
+    this.getRandomGame();
+    const received = this.game;
     this.game = received;
-    const valuesOnly = received.map(arr =>
-      arr.map(cell => (cell.value ? cell.value : ""))
+    const valuesOnly: any = received.map(arr =>
+      arr.map(cell => cell.value ? cell.value : "")
     );
-    (this.values as any) = valuesOnly;
+    this.values  = valuesOnly;
+    console.log(valuesOnly);
   }
 
-  getRandomGame(): Array<Array<ICell>> {
+  getRandomGame(): void {
 
     this.service.getGame().subscribe(data => {
       const id = getRandomIntInclusive(0, data.length - 1);
@@ -123,7 +125,6 @@ export class SudoKuComponent implements OnInit {
         this.gameDbId = dbGameId;
       }
     })
-    return;
 
     function getRandomIntInclusive(min, max) {
       min = Math.ceil(min);
@@ -134,7 +135,7 @@ export class SudoKuComponent implements OnInit {
 
   //SUBMIT
 
-  submitLevel() {
+  submitLevel(): void {
     const game: Array<Array<ICell>> = this.game;
 
     game.forEach(row => {
@@ -148,7 +149,7 @@ export class SudoKuComponent implements OnInit {
 
   //CLEAR
 
-  clear() {
+  clear(): void {
     this.creator = '';
     this.game = [
       [{}, {}, {}, {}, {}, {}, {}, {}, {}],
@@ -165,7 +166,7 @@ export class SudoKuComponent implements OnInit {
 
   //KILL IT
 
-  check() {
+  check(): void {
     let isReady: boolean = true;
     let isDone: boolean = true;
 
