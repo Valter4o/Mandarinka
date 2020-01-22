@@ -40,6 +40,18 @@ export class SudoKuComponent implements OnInit {
   public creator: string;
   private gameDbId: string;
 
+  // private testGame: Array<Array<number>> = [
+  //   [8, 1, 5, 3, 4, 2, 6, 9, 7],
+  //   [2, 3, 6, 8, 7, 9, 4, 5, 1],
+  //   [4, 9, 7, 6, 5, 1, 8, 3, 2],
+  //   [3, 8, 4, 2, 9, 6, 7, 1, 5],
+  //   [6, 2, 9, 5, 1, 7, 3, 8, 4],
+  //   [5, 7, 1, 4, 8, 3, 2, 6, 9],
+  //   [9, 6, 8, 1, 2, 4, 5, 7, 3],
+  //   [7, 4, 3, 9, 6, 5, 1, 2, 8],
+  //   [1, 5, 2, 7, 3, 8, 9, 4, 6],
+  // ]
+
   constructor(
     public dialog: MatDialog,
     private service: SudokuServiceService
@@ -47,7 +59,7 @@ export class SudoKuComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.showDetails();
+    // this.showDetails();
   }
 
   //ADDING NUMBER
@@ -97,17 +109,6 @@ export class SudoKuComponent implements OnInit {
 
   //GENERATE LEVEL
 
-  getLevel(): void {
-    this.getRandomGame();
-    const received = this.game;
-    this.game = received;
-    const valuesOnly: any = received.map(arr =>
-      arr.map(cell => cell.value ? cell.value : "")
-    );
-    this.values  = valuesOnly;
-    console.log(valuesOnly);
-  }
-
   getRandomGame(): void {
 
     this.service.getGame().subscribe(data => {
@@ -122,9 +123,21 @@ export class SudoKuComponent implements OnInit {
         this.getRandomGame();
       } else {
         this.game = game;
+        const valuesOnly = [];
+        game.forEach((row) => {
+          const valueRow = [];
+
+          row.forEach((obj) => {
+            valueRow.push(obj.value);
+          })
+
+          valuesOnly.push(valueRow);
+        })
+        this.values = valuesOnly;
         this.gameDbId = dbGameId;
       }
     })
+    return;
 
     function getRandomIntInclusive(min, max) {
       min = Math.ceil(min);
