@@ -32,12 +32,14 @@ import { AuthService } from "./auth/authentication.service";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { ErrorComponent } from './auth/popups/error/error.component';
+import { IgniteUi } from "./dependencies/igniteui.module";
 
 
 
 @NgModule({
   declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent, ErrorComponent],
   imports: [
+    IgniteUi,
     AngularMaterialModule,
     ReactiveFormsModule,
     FormsModule,
