@@ -1,3 +1,15 @@
 <div class="example-box" cdkDrag>
-    Drag me around
-  </div>
+  Drag me around
+</div>
+
+<div id='ships'>
+
+</div>
+
+<div id='board'>
+  <table id='table'>
+    <tr *ngFor="let row of board">
+      <td *ngFor="let box of row"></td>
+    </tr>
+  </table>
+</div>
