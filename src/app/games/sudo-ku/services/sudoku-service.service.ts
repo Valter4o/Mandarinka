@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ICell } from "../sudo-ku/interfaces/cell";
 import { AngularFirestore } from '@angular/fire/firestore';
+import { ICell } from "../interfaces/cell";
 
 @Injectable({
   providedIn: 'root'

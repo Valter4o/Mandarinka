@@ -6,13 +6,14 @@ import { Rules } from "./popups/rules/rules.component";
 import { NotfinishedComponent } from "./popups/game/notfinished/notfinished.component";
 import { WonComponent } from './popups/game/finished/won/won.component';
 import { LostComponent } from './popups/game/finished/lost/lost.component';
-import { SudokuServiceService } from "../services/sudoku-service.service";
+import { SudokuServiceService } from "./services/sudoku-service.service";
 
 @Component({
   selector: "app-sudo-ku",
   templateUrl: "./sudo-ku.component.html",
   styleUrls: ["./sudo-ku.component.css"]
 })
+
 export class SudoKuComponent implements OnInit {
   private game: Array<Array<ICell>> = [
     [{}, {}, {}, {}, {}, {}, {}, {}, {}],
@@ -25,6 +26,7 @@ export class SudoKuComponent implements OnInit {
     [{}, {}, {}, {}, {}, {}, {}, {}, {}],
     [{}, {}, {}, {}, {}, {}, {}, {}, {}]
   ];
+  
   private values: Array<string[] | number[]> = [
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""],
@@ -36,6 +38,7 @@ export class SudoKuComponent implements OnInit {
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""]
   ];
+
   private markedBox: ICellLocation = {};
   public creator: string;
   private gameDbId: string;
@@ -59,7 +62,7 @@ export class SudoKuComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.showDetails();
+    this.showDetails();
   }
 
   //ADDING NUMBER
