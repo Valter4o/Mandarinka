@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IBox } from '../interfaces/Box';
 
 @Component({
   selector: 'app-prebattle',
@@ -12,4 +13,33 @@ export class PrebattleComponent implements OnInit {
   ngOnInit() {
   }
 
+  private board: Array<Array<IBox>> = [
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+    [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
+  ]
+
+  private ships = {
+    tier1: [
+      {
+        
+      }
+    ],
+    tier2: [
+
+    ],
+    tier3: [
+
+    ],
+    tier4: [
+
+    ]
+  }
 }

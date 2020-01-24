@@ -13,7 +13,7 @@ export class PacmanComponent implements OnInit {
   initPacmanX: any; initPacmanY: any;
 
   WALL: number = 0;
-  PACMAN: number = 5;
+  PACMAN: number = 5; 
   ROAD: number = 2;
 
   EAT_COIN: number = 1;

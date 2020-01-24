@@ -17,28 +17,28 @@
 }
 
 .pacman {
-    background-image: url(./images/images/pacman-left.png);
+    background-image: url(/assets/images-pacman/images/pacman-left.png);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     
 }
 
 .coin {
-    background-image: url('./images/images/coin.png');
+    background-image: url('/assets/images-pacman/images/coin.png');
     background-size: 25% 25%;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .bonus-coin {
-    background-image: url('./images/images/coin.png');
+    background-image: url('/assets/images-pacman/images/coin.png');
     background-size: 60% 60%;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .wall {
-    background-image: url('./images/images/wall.png');
+    background-image: url('/assets/images-pacman/images/wall.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
@@ -48,25 +48,25 @@
 }
 
 .ghost-pink {
-    background-image: url('./images/images/ghost_pink.png');
+    background-image: url('/assets/images-pacman/images/ghost_pink.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
 .ghost-blue {
-    background-image: url('./images/images/ghost_blue.png');
+    background-image: url('/assets/images-pacman/images/ghost_blue.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
 .ghost-orange {
-    background-image: url('./images/images/ghost_orange.png');
+    background-image: url('/assets/images-pacman/images/ghost_orange.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
 
 .ghost-red {
-    background-image: url('./images/images/life_red.png');
+    background-image: url('/assets/images-pacman/images/life_red.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }
