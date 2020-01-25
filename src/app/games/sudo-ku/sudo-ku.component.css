@@ -98,7 +98,6 @@ li span {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: sans-serif;
   text-transform: capitalize;
   transform: translateX(calc(-0.15em * 3 - 0.08em * 2));
   transition: 0.3s;
@@ -114,4 +113,9 @@ li:hover span {
 
 .static {
   background-color: skyblue;
+}
+
+*{
+  font-family: 'Press Start 2P',cursive;
+  font-size: medium;
 }

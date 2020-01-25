@@ -3,9 +3,14 @@
 }
 
 .items {
-    margin-left: 600px;
+    margin-left: 300px;
 }
 
 .registerBtn {
     margin-left: 20px;
+}
+
+*{
+    font-family: 'Press Start 2P',cursive ;
+    font-size: small;
 }

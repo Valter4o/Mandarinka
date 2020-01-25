@@ -8,6 +8,7 @@
     font-style: oblique;
     color: green;
 }
+
 p{
     color:forestgreen
 }
@@ -15,8 +16,12 @@ p{
 .btn{
     width: 200px;
 }
+h1{
+    font-family: 'Press Start 2P',cursive;
+}
 
 .jumbotron{
+    font-family: 'Press Start 2P',cursive;
     height: 700px;
     width: 100%;
     background-image: url('../common/images/kill-bill-movie-wallpaper-54200-55933-hd-wallpapers.jpg');

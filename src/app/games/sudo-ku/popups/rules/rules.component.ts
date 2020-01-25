@@ -3,7 +3,8 @@ import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
   selector: "rules",
-  templateUrl: "rules.html"
+  templateUrl: "rules.html",
+  styleUrls:["./rules.component.css"]
 })
 export class Rules {
   constructor(
