@@ -3,9 +3,13 @@ import { CommonModule } from '@angular/common';
 
 // Components
 import { BonusGameComponent } from './bonus-game/bonus-game.component';
+
 import { BattleShipsComponent } from './battle-ships/battle-ships.component';
-import { SudoKuComponent } from './sudo-ku/sudo-ku.component';
 import { BattleComponent } from './battle-ships/battle/battle.component';
+
+import { SudoKuComponent } from './sudo-ku/sudo-ku.component';
+import { PacmanComponent } from './pacman/pacman.component';
+import { TetrisComponent } from './tetris/tetris.component';
 
 // Material stuff
 import { MatDialogModule } from '@angular/material/dialog';
@@ -23,14 +27,13 @@ import { PrebattleComponent } from './battle-ships/prebattle/prebattle.component
 
 //CDK module
 import { DragDropModule } from "@angular/cdk/drag-drop";
-import { PacmanComponent } from './pacman/pacman.component';
 
 
 @NgModule({
-  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent],
+  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent, TetrisComponent],
 
   imports: [CommonModule, MatDialogModule, MatButtonModule, DragDropModule],
   entryComponents: [LostComponent, RulesComponent, Rules, NotfinishedComponent, WonComponent, LostComponent, LostBonusComponent, WonBonusComponent],
-  exports: [BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent]
+  exports: [BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent,TetrisComponent]
 })
 export class GamesModule { }
