@@ -9,6 +9,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 import { PacmanComponent } from './games/pacman/pacman.component';
+import { TetrisComponent } from './games/tetris/tetris.component';
 
 
 const routes: Routes = [
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'forgotpassword', component: ForgotPasswordComponent },
   { path: 'verify-email', component: VerifyEmailComponent },
   { path: 'pacman', component: PacmanComponent },
+  { path: 'tetris', component: TetrisComponent },
 ];
 
 @NgModule({
