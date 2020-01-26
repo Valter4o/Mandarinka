@@ -1,9 +1,9 @@
-.container{
+.container {
     width: 100%;
     display: flex;
-    flex-direction: row ;
+    flex-direction: row;
     justify-content: space-between;
-    background-image: url('../images/45bac5ac24fd524f2cc2034cbd9a406f-700.jpg');
+    background-image: url('/assets/images-ships/45bac5ac24fd524f2cc2034cbd9a406f-700.jpg');
 }
 
 table#first-player, table#second-player {

@@ -1,10 +1,6 @@
 .main-container {
+    margin-left: 500px;
     justify-content: center;
-}
-
-.game-section {
-    outline: dotted rebeccapurple;
-    text-align: center;
 }
 
 .block {
@@ -20,7 +16,6 @@
     background-image: url(/assets/images-pacman/images/pacman-left.png);
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    
 }
 
 .coin {

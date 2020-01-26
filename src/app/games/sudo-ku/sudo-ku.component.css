@@ -1,7 +1,7 @@
 #container {
   display: flex;
   width: 100%;
-  background-image: url('./images/title.png');
+  background-image: url('/assets/images-sudoku/title.png');
 }
 
 div#chessboard {
