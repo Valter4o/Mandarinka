@@ -9,20 +9,20 @@ import { PacmanService } from './services/pacman.service';
 export class PacmanComponent implements OnInit {
   title = 'Pacman Game';
   gameFinished: boolean = false;
-  gameMap: Array<Object>;
-  initPacmanX: any; initPacmanY: any;
+  gameMap: Array<number[]>;
+  initPacmanX: number; initPacmanY: number;
 
-  WALL: number = 0;
-  PACMAN: number = 5; 
-  ROAD: number = 2;
+  readonly WALL: number = 0;
+  readonly PACMAN: number = 5;
+  readonly ROAD: number = 2;
 
-  EAT_COIN: number = 1;
-  EAT_BIG_COIN: number = 4;
-  GHOST: number = 3;
+  readonly EAT_COIN: number = 1;
+  readonly EAT_BIG_COIN: number = 4;
+  readonly GHOST: number = 3;
 
   totalScore: number = 0;
-  eatCoin: number = 2;
-  eatBigCoin = 4;
+  readonly eatCoin: number = 2;
+  readonly eatBigCoin = 4;
 
   pacmanMove: number = 2; // 1 ==> up, 2==>right, 3==>down, 4==>left
   ghostMeetWall: boolean = false;
@@ -38,6 +38,71 @@ export class PacmanComponent implements OnInit {
     this.gameMap = services.map;
   }
 
+
+  moveDir(code) {
+    const next = {
+      '37': this.initPacmanY - 1,
+      '38': this.initPacmanX - 1,
+      '39': this.initPacmanY + 1,
+      '40': this.initPacmanX + 1,
+    }
+
+    const nextFaceDir = {
+      '37': 4,
+      '38': 1,
+      '39': 2,
+      '40': 3,
+    }
+
+    const finalMove = {
+      '37': () => this.initPacmanY -= 1,
+      '38': () => this.initPacmanX -= 1,
+      '39': () => this.initPacmanY += 1,
+      '40': () => this.initPacmanX += 1,
+    }
+
+    let nextDirId = next[code];
+
+    const nextBox = code === 38 || code === 40 ?
+      this.gameMap[nextDirId][this.initPacmanY] :
+      this.gameMap[this.initPacmanX][nextDirId]
+
+
+    if (nextBox === this.WALL) {
+      console.log('STENAAA')
+    } else {
+      //Change face 
+      this.scoreUpdate(nextBox);//For updating score
+      this.pacmanMove = nextFaceDir[code];//Setting pacman's face towards the dir he is going
+      this.pacmanMoved(this.initPacmanX, this.initPacmanY); //Replacing pacman box with nothing
+
+      if (nextDirId === -1) {
+        //Reached end map left or up
+        console.log('Mestq se');
+        if (code === 38) {
+          this.initPacmanX = this.gameMap.length - 1;
+        } else if (code === 37) {
+          this.initPacmanY = this.gameMap[this.initPacmanY]['length'] - 1;//Setting pacman's new position to right end of map
+        }
+
+      } else if (nextDirId === this.gameMap.length) {
+        //Reached down end
+        this.initPacmanX = 0;
+      } else if (nextDirId === this.gameMap[0].length && code === 39) {
+        //Reached right end
+        this.initPacmanY = 0;
+      } else {
+        finalMove[code]();
+      }
+
+      if (!this.gameFinished) {
+        console.log(this.initPacmanX, this.initPacmanY);
+        this.gameMap[this.initPacmanX][this.initPacmanY] = this.PACMAN;
+      }
+    }
+  }
+
+
   ngOnInit() {
     let map = this.gameMap;
     //Initial pacman coordinate (20,8)
@@ -52,124 +117,28 @@ export class PacmanComponent implements OnInit {
     }
   }
 
-  ngAfterViewInit(){
-    this.ghostRunning=true;
+
+  ngAfterViewInit() {
+    this.ghostRunning = true;
     this.ghostRun();
   }
+
+
 
   @HostListener('window:keydown', ['$event'])
   controlKeyboardEvent(event) {
     event.preventDefault();
+    const code = event.keyCode;
 
-    if (event.keyCode == 37) {
-      //Left Arrow Key < (20,8)
+    if (code === 37 || code === 38 || code === 39 || code === 40) {
 
-      let nextLeftY = this.initPacmanY - 1;
-      let nextLeft = this.gameMap[this.initPacmanX][nextLeftY]
-      
-      if (nextLeft == this.WALL) {
-        console.log('Wall');//Pacman Can't be moved away towards it's left
-      } else {
-        //Pacman will move one step away towards it's left
-        //Set the pacman face towards left
-
-        this.scoreUpdate(nextLeft);//For updating score
-        this.pacmanMove = 4;//Setting pacman's face towards left
-        this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-
-        if (this.initPacmanY == 0) {
-          //When pacman reached at left end point of map 
-          this.initPacmanY = this.gameMap[this.initPacmanY]['length'] - 1;//Setting pacman's new position to right end of map
-          this.scoreUpdate(this.gameMap[this.initPacmanX][this.initPacmanY]);
-        } else {
-          this.initPacmanY--;
-        }
-      }
-
-    } else if (event.keyCode == 38) {
-      //Up Arrow Key ^
-      if (this.initPacmanX == 0) {
-        //When pacman reach extrem up end to game map
-        this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-        this.scoreUpdate(this.gameMap[this.initPacmanX][this.initPacmanY]);
-        this.initPacmanX = this.gameMap.length - 1;
-        this.pacmanMove = 1;//Set the pacman face towards up
-      } else {
-        let nextUpX = this.initPacmanX - 1;
-        let nextUp = this.gameMap[nextUpX][this.initPacmanY];
-        if (nextUp == this.WALL) {
-          console.log('Wall');//Pacman can't be moved away towards it's up
-
-        } else {
-          //Pacman will move one step away towards it's up
-          this.pacmanMove = 1;//Set the pacman face towards up
-          this.scoreUpdate(nextUp);//Udating score
-          this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-          this.initPacmanX--;
-        }
-      }
-
-
-    } else if (event.keyCode == 39) {
-      //Right Arrow Key >
-      let nextRightY = this.initPacmanY + 1;
-      let nextRight = this.gameMap[this.initPacmanX][nextRightY];
-      if (nextRight == this.WALL) {
-        console.log('Wall');//Pacman can't be moved away towards it's right
-      } else {
-        //Pacman will move one step away towards it's right
-        this.pacmanMove = 2;//Set the pacman face towards right
-        this.scoreUpdate(nextRight);//Updating score
-        this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-
-        if (this.initPacmanY == this.gameMap[this.initPacmanY]['length'] - 1) {
-          this.initPacmanY = 0;
-          this.scoreUpdate(this.gameMap[this.initPacmanX][this.initPacmanY])
-        } else {
-          this.initPacmanY++;
-        }
-
-      }
-
-    } else if (event.keyCode == 40) {
-      //Down Arrow Key v
-      if (this.initPacmanX == this.gameMap.length - 1) {
-        //When pacman reach extrem down end to game map 
-        this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-        this.scoreUpdate(this.gameMap[this.initPacmanX][this.initPacmanY]);
-        this.initPacmanX = 0;
-        this.pacmanMove = 3;
-      } else {
-        let nextUpX = this.initPacmanX + 1;
-        let nextUp = this.gameMap[nextUpX][this.initPacmanY];
-        if (nextUp == this.WALL) {
-          console.log('Wall');//Pacman can't be moved away towards it's down
-        } else {
-          //Pacman will move one step away towards it's left
-          this.pacmanMove = 3;//Set the pacman face towards left
-          this.scoreUpdate(nextUp);//Updating score
-          this.pacmanMoved(this.initPacmanX, this.initPacmanY);
-
-          this.initPacmanX++;
-        }
-      }
-
-    } else if (event.keyCode == 13) {
-      //Enter Key 
-      this.ghostRunning = true;
-      this.ghostRun();
-
+      this.moveDir(code);
     }
-
-    if (!this.gameFinished) {
-      console.log(this.initPacmanX, this.initPacmanY);
-      this.gameMap[this.initPacmanX][this.initPacmanY] = 5;
-    }
-
+    return
   }
 
   pacmanMoved(x, y) {
-    this.gameMap[x][y] = 2; //Replacing the pacman with black block
+    this.gameMap[x][y] = this.ROAD; //Replacing the pacman with black block
   }
 
   scoreUpdate(step) {
@@ -184,8 +153,7 @@ export class PacmanComponent implements OnInit {
 
   timeInterVal; movement;
   ghostRun() {
-
-    if (this.ghostRunning) {
+    if (!this.ghostRunning) {
       console.log('Ghost started run!');
       for (let i = 0; i < this.gameMap.length; i++) {
         for (let j = 0; j < this.gameMap[i]['length']; j++) {
