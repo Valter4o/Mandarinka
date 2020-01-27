@@ -38,7 +38,7 @@ export class PacmanComponent implements OnInit {
     this.gameMap = services.map;
   }
 
-
+  //! Pacman moves;
   moveDir(code) {
     const next = {
       '37': this.initPacmanY - 1,
@@ -103,6 +103,20 @@ export class PacmanComponent implements OnInit {
   }
 
 
+  pacmanMoved(x, y) {
+    this.gameMap[x][y] = this.ROAD; //Replacing the pacman with black block
+  }
+
+  scoreUpdate(step) {
+    if (step == this.EAT_COIN) {
+      this.totalScore = this.totalScore + this.eatCoin;
+    } else if (step == this.EAT_BIG_COIN) {
+      //Todo big coin makes ghost eatable
+      this.totalScore = this.totalScore + this.eatBigCoin;
+    }
+
+  }
+
   ngOnInit() {
     let map = this.gameMap;
     //Initial pacman coordinate (20,8)
@@ -123,8 +137,6 @@ export class PacmanComponent implements OnInit {
     this.ghostRun();
   }
 
-
-
   @HostListener('window:keydown', ['$event'])
   controlKeyboardEvent(event) {
     event.preventDefault();
@@ -137,23 +149,11 @@ export class PacmanComponent implements OnInit {
     return
   }
 
-  pacmanMoved(x, y) {
-    this.gameMap[x][y] = this.ROAD; //Replacing the pacman with black block
-  }
-
-  scoreUpdate(step) {
-    if (step == this.EAT_COIN) {
-      this.totalScore = this.totalScore + this.eatCoin;
-    } else if (step == this.EAT_BIG_COIN) {
-      //Todo big coin makes ghost eatable
-      this.totalScore = this.totalScore + this.eatBigCoin;
-    }
-
-  }
+  //! Ghost moves;
 
   timeInterVal; movement;
   ghostRun() {
-    if (!this.ghostRunning) {
+    if (this.ghostRunning) {
       console.log('Ghost started run!');
       for (let i = 0; i < this.gameMap.length; i++) {
         for (let j = 0; j < this.gameMap[i]['length']; j++) {
@@ -354,11 +354,11 @@ export class PacmanComponent implements OnInit {
     }
   }
 
-  newPositionGhost(newX, newY) {
+  newPositionGhost(newX, newY): void {
     this.gameMap[newX][newY] = 3;
   }
 
-  generateRandomNumber(t) {
+  generateRandomNumber(t): number {
     var flag = true;
     var i = 1;
     var tmp;
@@ -374,19 +374,19 @@ export class PacmanComponent implements OnInit {
   }
 
   findUnblockedWay(gx, gy) {
-    if (this.gameMap[gx - 1][gy] !== 0) {
-      //Check up
-      return 1;
-    } else if (this.gameMap[gx][gy + 1] !== 0) {
-      //Check right
-      return 2;
-    } else if (this.gameMap[gx + 1][gy] !== 0) {
-      //Check down
-      return 3;
-    } else if (this.gameMap[gx][gy - 1] !== 0) {
-      //Check left
-      return 4;
+      if (this.gameMap[gx - 1][gy] !== 0) {
+        //Check up
+        return 1;
+      } else if (this.gameMap[gx][gy + 1] !== 0) {
+        //Check right
+        return 2;
+      } else if (this.gameMap[gx + 1][gy] !== 0) {
+        //Check down
+        return 3;
+      } else if (this.gameMap[gx][gy - 1] !== 0) {
+        //Check left
+        return 4;
+      }
     }
-  }
 
-}
+  }
