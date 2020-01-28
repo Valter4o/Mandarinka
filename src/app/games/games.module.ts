@@ -27,10 +27,11 @@ import { PrebattleComponent } from './battle-ships/prebattle/prebattle.component
 
 //CDK module
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { ShipComponent } from './battle-ships/ship/ship.component';
 
 
 @NgModule({
-  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent, TetrisComponent],
+  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent, TetrisComponent, ShipComponent],
 
   imports: [CommonModule, MatDialogModule, MatButtonModule, DragDropModule],
   entryComponents: [LostComponent, RulesComponent, Rules, NotfinishedComponent, WonComponent, LostComponent, LostBonusComponent, WonBonusComponent],
