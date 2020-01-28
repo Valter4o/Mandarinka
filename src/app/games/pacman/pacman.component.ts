@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
 
 @Component({
@@ -33,6 +33,9 @@ export class PacmanComponent implements OnInit {
   ghostCrashed: boolean = false;
   ghostFreeMove: number; // 1--> Up, 2-->Right, 3--> Down, 4--> Left
 
+  private movingDir: number = 38;
+  private requestedDir: number = 38;
+
   constructor(private services: PacmanService) {
     document.title = this.title;
     this.gameMap = services.map;
@@ -40,28 +43,30 @@ export class PacmanComponent implements OnInit {
 
   //! Pacman moves;
   moveDir(code) {
-    const next = {
-      '37': this.initPacmanY - 1,
-      '38': this.initPacmanX - 1,
-      '39': this.initPacmanY + 1,
-      '40': this.initPacmanX + 1,
+    const dirObj = {
+      '37': {
+        nextBlock: this.initPacmanY - 1,
+        nextFace: 4,
+        move: () => this.initPacmanY -= 1
+      },
+      '38': {
+        nextBlock: this.initPacmanX - 1,
+        nextFace: 1,
+        move: () => this.initPacmanX -= 1
+      },
+      '39': {
+        nextBlock: this.initPacmanY + 1,
+        nextFace: 2,
+        move: () => this.initPacmanY += 1
+      },
+      '40': {
+        nextBlock: this.initPacmanX + 1,
+        nextFace: 3,
+        move: () => this.initPacmanX += 1
+      },
     }
-
-    const nextFaceDir = {
-      '37': 4,
-      '38': 1,
-      '39': 2,
-      '40': 3,
-    }
-
-    const finalMove = {
-      '37': () => this.initPacmanY -= 1,
-      '38': () => this.initPacmanX -= 1,
-      '39': () => this.initPacmanY += 1,
-      '40': () => this.initPacmanX += 1,
-    }
-
-    let nextDirId = next[code];
+    
+    let nextDirId = dirObj[code].nextBlock;
 
     const nextBox = code === 38 || code === 40 ?
       this.gameMap[nextDirId][this.initPacmanY] :
@@ -73,7 +78,7 @@ export class PacmanComponent implements OnInit {
     } else {
       //Change face 
       this.scoreUpdate(nextBox);//For updating score
-      this.pacmanMove = nextFaceDir[code];//Setting pacman's face towards the dir he is going
+      this.pacmanMove = dirObj[code].nextFace;//Setting pacman's face towards the dir he is going
       this.pacmanMoved(this.initPacmanX, this.initPacmanY); //Replacing pacman box with nothing
 
       if (nextDirId === -1) {
@@ -92,7 +97,7 @@ export class PacmanComponent implements OnInit {
         //Reached right end
         this.initPacmanY = 0;
       } else {
-        finalMove[code]();
+        dirObj[code].move();
       }
 
       if (!this.gameFinished) {
@@ -129,6 +134,13 @@ export class PacmanComponent implements OnInit {
         }
       }
     }
+    this.loop();
+  }
+
+  loop() {
+    this.moveDir(this.movingDir)
+
+      // requestAnimationFrame(this.loop.bind(this));
   }
 
 
@@ -143,7 +155,6 @@ export class PacmanComponent implements OnInit {
     const code = event.keyCode;
 
     if (code === 37 || code === 38 || code === 39 || code === 40) {
-
       this.moveDir(code);
     }
     return
@@ -374,19 +385,19 @@ export class PacmanComponent implements OnInit {
   }
 
   findUnblockedWay(gx, gy) {
-      if (this.gameMap[gx - 1][gy] !== 0) {
-        //Check up
-        return 1;
-      } else if (this.gameMap[gx][gy + 1] !== 0) {
-        //Check right
-        return 2;
-      } else if (this.gameMap[gx + 1][gy] !== 0) {
-        //Check down
-        return 3;
-      } else if (this.gameMap[gx][gy - 1] !== 0) {
-        //Check left
-        return 4;
-      }
+    if (this.gameMap[gx - 1][gy] !== 0) {
+      //Check up
+      return 1;
+    } else if (this.gameMap[gx][gy + 1] !== 0) {
+      //Check right
+      return 2;
+    } else if (this.gameMap[gx + 1][gy] !== 0) {
+      //Check down
+      return 3;
+    } else if (this.gameMap[gx][gy - 1] !== 0) {
+      //Check left
+      return 4;
     }
-
   }
+
+}
