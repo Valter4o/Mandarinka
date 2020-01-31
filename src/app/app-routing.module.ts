@@ -10,20 +10,21 @@ import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.
 import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
 import { PacmanComponent } from './games/pacman/pacman.component';
 import { TetrisComponent } from './games/tetris/tetris.component';
+import { AuthGuard } from './auth/auth.guard';
 
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'bonus', component: BonusGameComponent },
-  { path: 'battleships', component: BattleShipsComponent },
-  { path: 'sudoku', component: SudoKuComponent },
+  { path: 'bonus', canActivate: [AuthGuard], component: BonusGameComponent },
+  { path: 'battleships', canActivate: [AuthGuard], component: BattleShipsComponent },
+  { path: 'sudoku', canActivate: [AuthGuard], component: SudoKuComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'forgotpassword', component: ForgotPasswordComponent },
   { path: 'verify-email', component: VerifyEmailComponent },
-  { path: 'pacman', component: PacmanComponent },
-  { path: 'tetris', component: TetrisComponent },
+  { path: 'pacman', canActivate: [AuthGuard], component: PacmanComponent },
+  { path: 'tetris', canActivate: [AuthGuard], component: TetrisComponent },
 ];
 
 @NgModule({
