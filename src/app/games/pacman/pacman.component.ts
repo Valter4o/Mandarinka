@@ -1,5 +1,13 @@
 import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
+import { defer, interval, animationFrameScheduler, fromEvent, Observable, of } from 'rxjs';
+import { map, filter, startWith, distinctUntilChanged, switchMap, delay, tap, expand, share } from 'rxjs/operators';
+
+
+export interface IFrameData {
+  frameStartTime: number;
+  deltaTime: number;
+}
 
 @Component({
   selector: 'app-pacman',
@@ -65,7 +73,7 @@ export class PacmanComponent implements OnInit {
         move: () => this.initPacmanX += 1
       },
     }
-    
+
     let nextDirId = dirObj[code].nextBlock;
 
     const nextBox = code === 38 || code === 40 ?
@@ -137,16 +145,53 @@ export class PacmanComponent implements OnInit {
     this.loop();
   }
 
-  loop() {
-    this.moveDir(this.movingDir)
 
-      // requestAnimationFrame(this.loop.bind(this));
+  clampTo30FPS(frame: IFrameData) {
+    if (frame.deltaTime > (1 / 30)) {
+      frame.deltaTime = 1 / 30;
+    }
+    return frame;
+  }
+
+  calculateStep: (prevFrame: IFrameData) => Observable<IFrameData> = (prevFrame: IFrameData) => {
+    return Observable.create((observer) => {
+
+      requestAnimationFrame((frameStartTime) => {
+        // Millis to seconds
+        const deltaTime = prevFrame ? (frameStartTime - prevFrame.frameStartTime) / 1000 : 0;
+        observer.next({
+          frameStartTime,
+          deltaTime
+        });
+      })
+    })
+      .pipe(
+        map(this.clampTo30FPS)
+      )
+  };
+
+  frames = of(undefined)
+    .pipe(
+      expand((val) => this.calculateStep(val)),
+      // Expand emits the first value provided to it, and in this
+      //  case we just want to ignore the undefined input frame
+      filter(frame => frame !== undefined),
+      map((frame: IFrameData) => frame.deltaTime),
+      share()
+    )
+
+
+  loop() {
+    this.frames.subscribe((data)=>{
+    }
+    )
   }
 
 
+
   ngAfterViewInit() {
-    this.ghostRunning = true;
-    this.ghostRun();
+    // this.ghostRunning = true;
+    // this.ghostRun();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -162,7 +207,7 @@ export class PacmanComponent implements OnInit {
 
   //! Ghost moves;
 
-  timeInterVal; movement;
+   timeInterVal;// movement;
   ghostRun() {
     if (this.ghostRunning) {
       console.log('Ghost started run!');
