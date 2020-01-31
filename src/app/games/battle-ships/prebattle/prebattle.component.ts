@@ -43,8 +43,8 @@ export class PrebattleComponent implements OnInit {
   position: any
   
   drop(event: CdkDragDrop<string[]>) {
-    event.previousContainer.data[event.previousIndex].top = this.position ? this.position.y - this.boardElement.nativeElement.getBoundingClientRect().y : 0
-    event.previousContainer.data[event.previousIndex].left = this.position ? this.position.x - this.boardElement.nativeElement.getBoundingClientRect().x : 0
+    // event.previousContainer.data[event.previousIndex].top = this.position ? this.position.y - this.boardElement.nativeElement.getBoundingClientRect().y : 0
+    // event.previousContainer.data[event.previousIndex].left = this.position ? this.position.x - this.boardElement.nativeElement.getBoundingClientRect().x : 0
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
