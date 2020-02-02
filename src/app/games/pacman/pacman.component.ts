@@ -35,12 +35,10 @@ export class PacmanComponent implements OnInit {
 
   //Ghost properties
   ghostY: number; ghostX: number;
-  ghostRunning: boolean = false;
   ghostCrashed: boolean = false;
-  ghostFreeMove: number; // 1--> Up, 2-->Right, 3--> Down, 4--> Left
+  ghostLast: string;
 
   private movingDir: number = 38;
-  private requestedDir: number = 38;
   faceWall: boolean = false;
 
   constructor(private services: PacmanService) {
@@ -62,13 +60,21 @@ export class PacmanComponent implements OnInit {
       }
     }
 
-    setInterval(this.loop.bind(this), 250);
+    for (let i = 0; i < this.gameMap.length; i++) {
+      for (let j = 0; j < this.gameMap[i]['length']; j++) {
+        if (this.gameMap[i][j] == 3) {
+          this.ghostX = i;
+          this.ghostY = j;
+        }
+      }
+    }
+
+    // setInterval(this.loop.bind(this), 250);
   }
 
   loop() {
     this.moveDir(this.movingDir);
-    // this.ghostRunning = true;
-    this.ghostRun();
+    this.ghostRun(this.ghostX, this.ghostY);
   }
 
   //! Pacman moves;
@@ -168,77 +174,99 @@ export class PacmanComponent implements OnInit {
   //! Ghost moves;
 
   timeInterVal;
-  ghostRun() {
-    if (this.ghostRunning) {
-      console.log('Ghost started run!');
-      for (let i = 0; i < this.gameMap.length; i++) {
-        for (let j = 0; j < this.gameMap[i]['length']; j++) {
-          if (this.gameMap[i][j] == 3) {
-            this.ghostX = i;
-            this.ghostY = j;
-          }
-        }
+  ghostRun(gx, gy) {
+    console.log('Ghost started run!');
+
+    let moves: string[] = this.findOpenPath(gx, gy);
+
+    let moveId = this.generateRandomNumber(0, moves.length);
+    let move = moves[moveId];
+    let oposite = this.findOpposite(move);
+
+    if ((gx < this.initPacmanX) && (gy < this.initPacmanY)) {
+      console.log('Pacman is now down-right of ghost');
+      if (moves.includes('down') || moves.includes('right') && (move !== this.ghostLast)) {
+        moves = moves.filter((el) => el === 'down' || el === 'right');
       }
-
-      console.log('Ghost located at : GameMap[' + this.ghostX + '][' + this.ghostY + ']=' + this.gameMap[this.ghostX][this.ghostY]);
-      let wallMeetRight = false;
-
-      {
-        if ((this.ghostX < this.initPacmanX) && (this.ghostY < this.initPacmanY)) {
-          //When pacman located down-right on map respect to ghost's current position
-          console.log('Pacman is now down-right of ghost');
-
-          // G--> (4,2) , P--> (18,14)
-          if (this.gameMap[this.ghostX + 1][this.ghostY] == this.WALL) {
-            //When down step of ghost is blocked
-            if (this.gameMap[this.ghostX][this.ghostY + 1] !== this.WALL && !wallMeetRight) {
-              this.moveRight();
-            } else {
-              this.moveLeft();
-            }
-          } else {
-            this.moveDown();
-            wallMeetRight = false;
-          }
-
-        } else if ((this.ghostX < this.initPacmanX) && (this.ghostY > this.initPacmanY)) {
-          //When pacman located down-left on map respect to ghost's current position
-          console.log('Pacman is now down-left of ghost');
-
-        } else if (this.ghostY == this.initPacmanY) {
-          //When ghost and pacman are on same line vertically on map
-          console.log('Ghost and Pacman on line vertically!!');
-          if (this.ghostX < this.initPacmanX) {
-            console.log('Pacman is now down side of ghost vertically');
-
-          } else if (this.ghostX > this.initPacmanX) {
-            console.log('Pacman is now up side of ghost vertically');
-
-          }
-        }
+    } else if ((gx <= this.initPacmanX) && (gy >= this.initPacmanY)) {
+      //When pacman located down-left on map respect to ghost's current position
+      if (moves.includes('left') || moves.includes('down') && (move !== this.ghostLast)) {
+        moves = moves.filter((el) => el === 'down' || el === 'left');
+      }
+    } else if ((gx >= this.initPacmanX) && (gy <= this.initPacmanY)) {
+      //When pacman located up-right on map respect to ghost's current position
+      if (moves.includes('up') || moves.includes('right') && (move !== this.ghostLast)) {
+        moves = moves.filter((el) => el === 'up' || el === 'right');
+      }
+    } else if ((gx >= this.initPacmanX) && (gy >= this.initPacmanY)) {
+      //When pacman located up-left on map respect to ghost's current position
+      if (moves.includes('left') || moves.includes('up') && (move !== this.ghostLast)) {
+        moves = moves.filter((el) => el === 'up' || el === 'left');
       }
     }
 
+    if (move === this.ghostLast) {
+      moves = moves.filter((el) => el !== move);
+      moveId = this.generateRandomNumber(0, moves.length);
+      move = moves[moveId];
+      oposite = this.findOpposite(move);
+    }
+
+    this.ghostMovement(move);
+    this.ghostLast = oposite;
   }
 
-  findOpenPath() {
-    let a: Array<any> = [];
+  findOpenPath(gx, gy): string[] {
+    const freeDirArr = [];
+    if (this.gameMap[gx - 1][gy] !== this.WALL) {
+      freeDirArr.push('up');
+    }
+    if (this.gameMap[gx][gy + 1] !== this.WALL) {
+      freeDirArr.push('right');
+    }
+    if (this.gameMap[gx + 1][gy] !== this.WALL) {
+      freeDirArr.push('down');
+    }
+    if (this.gameMap[gx][gy - 1] !== this.WALL) {
+      freeDirArr.push('left');
+    }
+
+    return freeDirArr;
   }
+
+  findOpposite(move) {
+    if (move === 'up') {
+      return 'down'
+    } else if (move === 'right') {
+      return 'left'
+    } else if (move === 'down') {
+      return 'up'
+    } else if (move === 'left') {
+      return 'right';
+    }
+  }
+
 
   ghostMovement(move) {
-    if (move == 1) {
+    if (move === 'up') {
       //move up
       this.moveUp();
-    } else if (move == 2) {
+    } else if (move === 'right') {
       //move right
       this.moveRight();
-    } else if (move == 3) {
+    } else if (move === 'down') {
       //move down
       this.moveDown();
-    } else if (move == 4) {
+    } else if (move === 'left') {
       //move left
       this.moveLeft();
     }
+  }
+
+  generateRandomNumber(min, max): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 
   prevCoin;
@@ -365,36 +393,4 @@ export class PacmanComponent implements OnInit {
   newPositionGhost(newX, newY): void {
     this.gameMap[newX][newY] = 3;
   }
-
-  generateRandomNumber(t): number {
-    var flag = true;
-    var i = 1;
-    var tmp;
-    while (i > 0) {
-      tmp = Math.floor((Math.random() * 4) + 1);
-      if (tmp != t) {
-        break;
-      }
-      i++;
-    }
-    return tmp;
-
-  }
-
-  findUnblockedWay(gx, gy) {
-    if (this.gameMap[gx - 1][gy] !== 0) {
-      //Check up
-      return 1;
-    } else if (this.gameMap[gx][gy + 1] !== 0) {
-      //Check right
-      return 2;
-    } else if (this.gameMap[gx + 1][gy] !== 0) {
-      //Check down
-      return 3;
-    } else if (this.gameMap[gx][gy - 1] !== 0) {
-      //Check left
-      return 4;
-    }
-  }
-
 }
