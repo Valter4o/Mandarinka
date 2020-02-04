@@ -2,12 +2,12 @@ import { Component, OnInit, HostListener } from "@angular/core";
 import { ICell } from "./interfaces/cell";
 import { ICellLocation } from "./interfaces/CellLocation";
 import { MatDialog } from "@angular/material/dialog";
-import { Rules } from "./popups/rules/rules.component";
-import { NotfinishedComponent } from "./popups/game/notfinished/notfinished.component";
-import { WonComponent } from './popups/game/finished/won/won.component';
-import { LostComponent } from './popups/game/finished/lost/lost.component';
 import { SudokuServiceService } from "./services/sudoku-service.service";
-
+import { Rules } from './popups/rules/rules.component';
+import { NotfinishedComponent } from './popups/game/notfinished/notfinished.component';
+import { LostComponent } from './popups/game/finished/lost/lost.component';
+import { WonComponent } from './popups/game/finished/won/won.component';
+ 
 @Component({
   selector: "app-sudo-ku",
   templateUrl: "./sudo-ku.component.html",
@@ -26,7 +26,7 @@ export class SudoKuComponent implements OnInit {
     [{}, {}, {}, {}, {}, {}, {}, {}, {}],
     [{}, {}, {}, {}, {}, {}, {}, {}, {}]
   ];
-  
+
   private values: Array<string[] | number[]> = [
     ["", "", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", "", ""],

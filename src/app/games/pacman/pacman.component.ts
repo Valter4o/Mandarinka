@@ -1,5 +1,7 @@
-import { Component, OnInit, HostListener, NgZone } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
+import { MatDialog } from '@angular/material/dialog';
+import { StartGameComponent } from './popups/start-game/start-game.component';
 
 
 export interface IFrameData {
@@ -41,35 +43,42 @@ export class PacmanComponent implements OnInit {
   private movingDir: number = 38;
   faceWall: boolean = false;
 
-  constructor(private services: PacmanService) {
+  constructor(
+    public dialog: MatDialog,
+    private services: PacmanService
+  ) {
     document.title = this.title;
     this.gameMap = services.map;
   }
-
 
   ngOnInit() {
     let map = this.gameMap;
     //Initial pacman coordinate (20,8)
 
-    for (let i = 0; i < map.length; i++) {
-      for (let j = 0; j < map[i]['length']; j++) {
-        if (map[i][j] === 5) {
-          this.initPacmanX = i;
-          this.initPacmanY = j;
+    const dialogRef = this.dialog.open(StartGameComponent, {});
+    dialogRef.componentInstance.onClose.subscribe((res) => {
+      for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i]['length']; j++) {
+          if (map[i][j] === 5) {
+            this.initPacmanX = i;
+            this.initPacmanY = j;
+          }
         }
       }
-    }
 
-    for (let i = 0; i < this.gameMap.length; i++) {
-      for (let j = 0; j < this.gameMap[i]['length']; j++) {
-        if (this.gameMap[i][j] == 3) {
-          this.ghostX = i;
-          this.ghostY = j;
+      for (let i = 0; i < this.gameMap.length; i++) {
+        for (let j = 0; j < this.gameMap[i]['length']; j++) {
+          if (this.gameMap[i][j] == 3) {
+            this.ghostX = i;
+            this.ghostY = j;
+          }
         }
       }
-    }
+      this.dialog.closeAll();
+      setInterval(this.loop.bind(this), 250);
+      //TODO: Replace interval with Observable
+    })
 
-    // setInterval(this.loop.bind(this), 250);
   }
 
   loop() {
@@ -170,7 +179,6 @@ export class PacmanComponent implements OnInit {
 
   }
 
-
   //! Ghost moves;
 
   timeInterVal;
@@ -246,7 +254,6 @@ export class PacmanComponent implements OnInit {
     }
   }
 
-
   ghostMovement(move) {
     if (move === 'up') {
       //move up
@@ -274,10 +281,31 @@ export class PacmanComponent implements OnInit {
     this.gameMap[x][y] = this.prevCoin;
   }
 
+  ghostMoveAction(dir, ghost) {
+    const moveObj = {
+      'up': {
+
+      },
+      'down': {
+
+      },
+      'right': {
+
+      },
+      'left': {
+
+      }
+    };
+    const ghostsObj = {
+
+    };
+  }
+
   moveUp() {
     console.log('moveUp');
     if (this.ghostX == 0) {
       console.log('Ghost reach extreme up of map');
+      this.moveDown();
     } else {
 
       let nextUp = this.gameMap[this.ghostX - 1][this.ghostY];
@@ -307,6 +335,7 @@ export class PacmanComponent implements OnInit {
     console.log('moveRight');
     if (this.ghostY == this.gameMap[this.ghostY]['length'] - 1) {
       console.log('Ghost reach extreme right of map');
+      this.moveLeft();
     } else {
       let nextUp = this.gameMap[this.ghostX][this.ghostY + 1];
       if (nextUp == this.WALL) {
@@ -336,6 +365,7 @@ export class PacmanComponent implements OnInit {
     console.log('moveDown');
     if (this.ghostX == this.gameMap.length - 1) {
       console.log('Ghost reach extreme down of map');
+      this.moveUp
     } else {
 
       let nextUp = this.gameMap[this.ghostX + 1][this.ghostY];
@@ -366,6 +396,7 @@ export class PacmanComponent implements OnInit {
     console.log('moveLeft');
     if (this.ghostY == 0) {
       console.log('Ghost reach extreme left of map');
+      this.moveRight();
     } else {
       let nextUp = this.gameMap[this.ghostX][this.ghostY - 1];
       if (nextUp == this.WALL) {
