@@ -33,11 +33,12 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { ErrorComponent } from './auth/popups/error/error.component';
 import { IgniteUi } from "./dependencies/igniteui.module";
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 
 
 
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent, ErrorComponent],
+  declarations: [AppComponent, NavbarComponent, FooterComponent, HomeComponent, LoginComponent, RegisterComponent, ForgotPasswordComponent, VerifyEmailComponent, ErrorComponent, LeaderboardComponent],
   imports: [
     IgniteUi,
     AngularMaterialModule,
