@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { BattleShipsComponent } from './games/battle-ships/battle-ships.component';
 import { BonusGameComponent } from './games/bonus-game/bonus-game.component';
 import { SudoKuComponent } from './games/sudo-ku/sudo-ku.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -17,7 +16,6 @@ const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'bonus', canActivate: [AuthGuard], component: BonusGameComponent },
-  { path: 'battleships', canActivate: [AuthGuard], component: BattleShipsComponent },
   { path: 'sudoku', canActivate: [AuthGuard], component: SudoKuComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
