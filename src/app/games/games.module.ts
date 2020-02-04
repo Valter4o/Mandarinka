@@ -4,9 +4,6 @@ import { CommonModule } from '@angular/common';
 // Components
 import { BonusGameComponent } from './bonus-game/bonus-game.component';
 
-import { BattleShipsComponent } from './battle-ships/battle-ships.component';
-import { BattleComponent } from './battle-ships/battle/battle.component';
-
 import { SudoKuComponent } from './sudo-ku/sudo-ku.component';
 import { PacmanComponent } from './pacman/pacman.component';
 import { TetrisComponent } from './tetris/tetris.component';
@@ -23,18 +20,45 @@ import { LostComponent } from './sudo-ku/popups/game/finished/lost/lost.componen
 import { RulesComponent } from './bonus-game/popups/rules/rules.component';
 import { LostBonusComponent } from './bonus-game/popups/lost-bonus/lost-bonus.component';
 import { WonBonusComponent } from './bonus-game/popups/won-bonus/won-bonus.component';
-import { PrebattleComponent } from './battle-ships/prebattle/prebattle.component';
-
 //CDK module
 import { DragDropModule } from "@angular/cdk/drag-drop";
-import { ShipComponent } from './battle-ships/ship/ship.component';
+import { StartGameComponent } from './pacman/popups/start-game/start-game.component';
+import { PacmanDieComponent } from './pacman/popups/pacman-die/pacman-die.component';
+import { PacmanWinComponent } from './pacman/popups/pacman-win/pacman-win.component';
 
 
 @NgModule({
-  declarations: [Rules, BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent, NotfinishedComponent, WonComponent, LostComponent, RulesComponent, LostBonusComponent, WonBonusComponent, PrebattleComponent, PacmanComponent, TetrisComponent, ShipComponent],
+  declarations: [
+    Rules,
+    BonusGameComponent,
+    SudoKuComponent,
+    NotfinishedComponent,
+    WonComponent,
+    LostComponent,
+    RulesComponent,
+    LostBonusComponent,
+    WonBonusComponent,
+    PacmanComponent,
+    TetrisComponent,
+    StartGameComponent,
+    PacmanDieComponent,
+    PacmanWinComponent
+  ],
 
   imports: [CommonModule, MatDialogModule, MatButtonModule, DragDropModule],
-  entryComponents: [LostComponent, RulesComponent, Rules, NotfinishedComponent, WonComponent, LostComponent, LostBonusComponent, WonBonusComponent],
-  exports: [BonusGameComponent, BattleShipsComponent, SudoKuComponent, BattleComponent,TetrisComponent]
+  entryComponents: [
+    StartGameComponent,
+    PacmanDieComponent,
+    PacmanWinComponent,
+    LostComponent,
+    RulesComponent,
+    Rules,
+    NotfinishedComponent,
+    WonComponent,
+    LostComponent,
+    LostBonusComponent,
+    WonBonusComponent
+  ],
+  exports: [BonusGameComponent, SudoKuComponent, TetrisComponent]
 })
 export class GamesModule { }
