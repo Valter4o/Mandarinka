@@ -10,6 +10,7 @@ import { VerifyEmailComponent } from './auth/verify-email/verify-email.component
 import { PacmanComponent } from './games/pacman/pacman.component';
 import { TetrisComponent } from './games/tetris/tetris.component';
 import { AuthGuard } from './auth/auth.guard';
+import { LeaderboardComponent } from './leaderboard/leaderboard.component';
 
 
 const routes: Routes = [
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'verify-email', component: VerifyEmailComponent },
   { path: 'pacman', canActivate: [AuthGuard], component: PacmanComponent },
   { path: 'tetris', canActivate: [AuthGuard], component: TetrisComponent },
+  { path: 'leaderboard', canActivate: [AuthGuard], component: LeaderboardComponent }
 ];
 
 @NgModule({
