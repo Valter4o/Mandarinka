@@ -1,25 +1,41 @@
-  import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RulesComponent } from './popups/rules/rules.component';
 import { MatDialog } from "@angular/material/dialog";
 import { LostBonusComponent } from './popups/lost-bonus/lost-bonus.component';
 import { WonBonusComponent } from './popups/won-bonus/won-bonus.component';
+import { ScoreService } from '../shared/score.service';
 
 @Component({
   selector: 'app-bonus-game',
   templateUrl: './bonus-game.component.html',
   styleUrls: ['./bonus-game.component.css']
 })
-export class BonusGameComponent implements OnInit {
+export class BonusGameComponent implements OnInit, OnDestroy {
   counter: any = 0;
+  highScore: number;
   table: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
   indexes: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   history: string[] = [];
   nextBoxes: string[] = [];
 
-  constructor(public dialog: MatDialog) { }
+  constructor(
+    public dialog: MatDialog,
+    public scoreService: ScoreService
+  ) { }
 
   ngOnInit(): void {
     this.rulesHandler();
+    const username = localStorage.username;
+    this.highScore = this.scoreService.getUserScore(username, 'bonus');
+  }
+
+  ngOnDestroy(): void {
+    this.updateScore();
+  }
+
+  updateScore() {
+    const uid = JSON.parse(localStorage.user).uid;
+    this.scoreService.updateScore(uid, 'bonus', this.highScore)
   }
 
   rulesHandler() {
@@ -32,6 +48,9 @@ export class BonusGameComponent implements OnInit {
     if (!box.textContent) {
       if (this.nextBoxes.includes(boxId) || this.counter === 0) {
         this.counter++;
+        if (this.counter > this.highScore) {
+          this.highScore = this.counter;
+        }
         const h4 = document.createElement('h4');
         h4.textContent = this.counter;
         box.appendChild(h4);
@@ -41,7 +60,7 @@ export class BonusGameComponent implements OnInit {
         this.markNext(next);
 
         this.history.push(letter + num);
-        
+
         if (this.counter === 100) {
           this.dialog.open(WonBonusComponent)
         }
@@ -159,6 +178,7 @@ export class BonusGameComponent implements OnInit {
   }
 
   refresh() {
+    this.updateScore();
     this.counter = 0;
     Array.from(document.querySelectorAll('td'))
       .forEach((el) => {
