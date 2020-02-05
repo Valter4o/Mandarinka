@@ -9,12 +9,16 @@
       </div>
 
       <div class="formGroup">
+        <input type="username" class="formControl" placeholder="Username" #userName required>
+      </div>
+
+      <div class="formGroup">
         <input type="password" class="formControl" placeholder="Password" #userPwd required>
       </div>
 
       <div class="formGroup">
-        <input type="button" class="btn btnPrimary" value="Sign Up" 
-          (click)="authService.SignUp(userEmail.value, userPwd.value)">
+        <input type="button" class="btn btnPrimary" value="Sign Up"
+          (click)="authService.SignUp(userEmail.value, userPwd.value,userName.value)">
       </div>
 
       <div class="formGroup">
