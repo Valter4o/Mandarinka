@@ -6,12 +6,13 @@
   <span class="nav-tool-items items">
     <div *ngIf="user" class='btns'>
       <span>
-        Hello <a href="user/:user.uid">{{user.username ||user.displayName}}</a>
+        Hello <a href="user/:user.uid">{{username ||user.displayName}}</a>
       </span>
       <a mat-button href="sudoku">Sudo-ku</a>
       <a mat-button href="pacman">Pacman</a>
       <a mat-button href="tetris">Tetris</a>
       <a mat-button href="bonus">Bonus game</a>
+      <a mat-button href="leaderboard">Leaderboard</a>
       <a mat-button (click)="logout()">Log Out</a>
     </div>
     <div *ngIf="!user" class='authBtns'>

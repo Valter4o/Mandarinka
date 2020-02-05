@@ -10,22 +10,23 @@ import { User } from '../../auth/user/services/iuser';
 })
 export class NavbarComponent implements OnInit {
   user: User;
+  username: string;
 
   constructor(
     public authService: AuthService,
     public router: Router,
-  ) {
-    this.user = JSON.parse(localStorage.user);
-  }
+  ) { }
 
   ngDoCheck(): void {
     this.user = JSON.parse(localStorage.user);
+    this.username = localStorage.username;
   }
+  
   ngOnInit() {
   }
 
   logout() {
-    this.authService.SignOut().then(() => {  
+    this.authService.SignOut().then(() => {
       this.router.navigate(['home']);
     }).catch((err) => {
       //TODO
