@@ -1,27 +1,16 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import { AuthService } from "../auth/authentication.service";
-import { Router } from "@angular/router";
-import { User } from '../auth/user/services/iuser';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
-  user: User;
+export class HomeComponent{
+  userLogged: string;
 
-  constructor(
-    public authService: AuthService,
-    public router: Router,
-    public ngZone: NgZone,
-  ) {  }
+  constructor() { }
 
-  ngDoCheck(): void {
-    this.user = JSON.parse(localStorage.user);
+  ngDoCheck() {
+    this.userLogged = localStorage.username;
   }
-
-  ngOnInit() {
-  }
-
 }

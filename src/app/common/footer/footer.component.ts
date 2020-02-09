@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../../auth/user/services/iuser';
 
 @Component({
   selector: 'app-footer',
@@ -7,13 +6,13 @@ import { User } from '../../auth/user/services/iuser';
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent implements OnInit {
-  user: User;
+  isLogged: string;
 
   constructor() {
-    this.user = JSON.parse(localStorage.user);
   }
 
   ngOnInit() {
+    this.isLogged = localStorage.username;
   }
 
 }

@@ -9,29 +9,23 @@ import { User } from '../../auth/user/services/iuser';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-  user: User;
   username: string;
 
   constructor(
     public authService: AuthService,
-    public router: Router,
   ) { }
 
-  ngDoCheck(): void {
-    this.user = JSON.parse(localStorage.user);
-    this.username = localStorage.username;
-  }
-  
   ngOnInit() {
+    this.username = localStorage.username;
   }
 
   logout() {
-    this.authService.SignOut().then(() => {
-      this.router.navigate(['home']);
-    }).catch((err) => {
-      //TODO
-      alert(err.message)
-    })
+    this.authService.SignOut()
+      .then()
+      .catch((err) => {
+        //TODO
+        alert(err.message)
+      })
       ;
   }
 
