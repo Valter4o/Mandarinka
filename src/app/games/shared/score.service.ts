@@ -1,32 +1,43 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { IPlayerScore } from '../../leaderboard/interfaces/PlayerScore';
+import { map, shareReplay } from 'rxjs/operators'
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScoreService {
-  leaderboard: IPlayerScore[] = [];
+  private cache$: Observable<Array<IPlayerScore>>
 
   constructor(
     private firestore: AngularFirestore
   ) { }
 
-  getScores() {
-    this.firestore.collection('leaderboard')
-      .snapshotChanges()
-      .subscribe((data) => {
-        for (let el of data) {
-          this.leaderboard.push(el.payload.doc.data() as IPlayerScore);
-        }
-
-        localStorage.setItem('leaderboard', JSON.stringify(this.leaderboard));
-      });
+  get score(): Observable<any> {
+    if (!this.cache$) {
+      this.cache$ = this.requestScore().pipe(
+        shareReplay(1)
+      )
+    }
+    return this.cache$;
   }
 
-  getUserScore(username, game) {
-    const leaderboard = JSON.parse(localStorage.leaderboard);
-    return leaderboard.find((el) => el.username === username)[game];
+  requestScore(): Observable<any> {
+    return this.firestore.collection('leaderboard')
+      .snapshotChanges()
+      .pipe(
+        map(arr => arr.map((el) => el.payload.doc.data())),
+      )
+  }
+
+  getUserScore(username, game): Observable<number> {
+    return this.firestore.collection('leaderboard')
+      .snapshotChanges()
+      .pipe(
+        map(arr => arr.map((el) => el.payload.doc.data())),
+        map(arr => arr.find((el: IPlayerScore) => el.username === username)[game])
+      )
   }
 
   createUser(username, uid) {
@@ -49,11 +60,11 @@ export class ScoreService {
   updateScore(uid, game, score) {
     if (game === 'bonus') {
       this.firestore.collection('leaderboard').doc(`${uid}`).set({ bonus: score }, { merge: true });
-    }else if (game === 'pacman') {
+    } else if (game === 'pacman') {
       this.firestore.collection('leaderboard').doc(`${uid}`).set({ pacman: score }, { merge: true });
-    }else if (game === 'sudoku') {
+    } else if (game === 'sudoku') {
       this.firestore.collection('leaderboard').doc(`${uid}`).set({ sudoku: score }, { merge: true });
-    }else if (game === 'tetris') {
+    } else if (game === 'tetris') {
       this.firestore.collection('leaderboard').doc(`${uid}`).set({ tetris: score }, { merge: true });
     }
   }
