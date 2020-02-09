@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
 import { IPlayerScore } from "./interfaces/PlayerScore";
 import { ScoreService } from '../games/shared/score.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-leaderboard',
@@ -9,16 +10,13 @@ import { ScoreService } from '../games/shared/score.service';
 })
 export class LeaderboardComponent implements OnInit {
   displayedColumns: string[] = ['username', 'sudoku', 'pacman', 'tetris', 'bonus'];
-  dataSource: IPlayerScore[];
+  dataSource: Observable<IPlayerScore[]>;
+
   constructor(
     private scoreService: ScoreService
   ) { }
 
   ngOnInit() {
-    this.scoreService.getScores();
-  }
-
-  ngDoCheck() {
-    this.dataSource = JSON.parse(localStorage.leaderboard);
+    this.dataSource = this.scoreService.score;
   }
 }
