@@ -11,7 +11,7 @@ import { ScoreService } from '../games/shared/score.service';
 })
 
 export class AuthService {
-  userData: any; // Save logged in user data
+  userData: firebase.User; // Save logged in user data
 
   constructor(
     public score: ScoreService,
@@ -20,18 +20,17 @@ export class AuthService {
     public router: Router,
     public ngZone: NgZone // NgZone service to remove outside scope warning
   ) {
-    /* Saving user data in localstorage when 
-    logged in and setting up null when logged out */
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userData = user;
-        localStorage.setItem('user', JSON.stringify(this.userData));
-        JSON.parse(localStorage.getItem('user'));
       } else {
-        localStorage.setItem('user', null);
-        JSON.parse(localStorage.getItem('user'));
+        this.userData = null;
       }
     })
+  }
+
+  getUserData() {
+    return this.afAuth.authState
   }
 
   // Sign in with email/password
@@ -41,9 +40,9 @@ export class AuthService {
         const uid = result.user.uid;
         this.afs.doc(`usernames/${uid}`).snapshotChanges().subscribe(data => {
           const username = (data.payload.data() as any).username;
-          localStorage.setItem('username', username)
+          localStorage.setItem('username', username);
           this.score.createUser(username, uid);
-          this.score.getScores();
+          // this.score.getScores();
         })
         this.ngZone.run(() => {
           this.router.navigate(['home']);
@@ -58,8 +57,6 @@ export class AuthService {
   SignUp(email, password, username) {
     return this.afAuth.auth.createUserWithEmailAndPassword(email, password)
       .then((result) => {
-        /* Call the SendVerificaitonMail() function when new user sign 
-        up and returns promise */
         this.SendVerificationMail();
         this.SetUsername(username, result.user.uid);
       }).catch((error) => {
@@ -91,7 +88,7 @@ export class AuthService {
 
   // Returns true when user is looged in and email is verified
   get isLoggedIn(): boolean {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = this.userData;
     return (user !== null && user.emailVerified !== false) ? true : false;
   }
 
@@ -113,9 +110,6 @@ export class AuthService {
       })
   }
 
-  /* Setting up user data when sign in with username/password, 
-  sign up with username/password and sign in with social auth  
-  provider in Firestore database using AngularFirestore + AngularFirestoreDocument service */
   SetUserData(user) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.uid}`);
     const userData: User = {
@@ -135,7 +129,8 @@ export class AuthService {
   // Sign out 
   SignOut() {
     return this.afAuth.auth.signOut().then(() => {
-      localStorage.removeItem('user');
+      this.userData = null;
+      localStorage.clear();
       this.router.navigate(['home']);
     })
   }
