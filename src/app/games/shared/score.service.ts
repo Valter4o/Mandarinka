@@ -33,9 +33,8 @@ export class ScoreService {
 
   getUserScore(username, game): Observable<number> {
     return this.firestore.collection('leaderboard')
-      .snapshotChanges()
+      .valueChanges()
       .pipe(
-        map(arr => arr.map((el) => el.payload.doc.data())),
         map(arr => arr.find((el: IPlayerScore) => el.username === username)[game])
       )
   }
