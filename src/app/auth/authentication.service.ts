@@ -9,7 +9,6 @@ import { ScoreService } from '../games/shared/score.service';
 @Injectable({
   providedIn: 'root'
 })
-
 export class AuthService {
   userData: firebase.User; // Save logged in user data
 
