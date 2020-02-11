@@ -104,6 +104,12 @@ export class AuthService {
           this.router.navigate(['home']);
         })
         this.SetUserData(result.user);
+        this.afs.doc(`usernames/${result.user.uid}`).snapshotChanges().subscribe(data => {
+          const username = (data.payload.data() as any).username;
+          localStorage.setItem('username', username);
+          this.score.createUser(username, result.user.uid);
+          // this.score.getScores();
+        })
       }).catch((error) => {
         window.alert(error)
       })
