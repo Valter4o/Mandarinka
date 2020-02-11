@@ -2,19 +2,23 @@
   <section class="game-section">
     <div class="row" *ngFor=" let row of gameMap; let i = index ">
       <div class="block" *ngFor=" let block of row; let j = index " [ngClass]="{
-            'pacman' : block === 5,
-            'wall' : block === 0,
-            'coin' : block === 1,
-            'road' : block === 2,
-            'bonus-coin' : block === 4,
-            'ghost-pink' : block === 3
+          	'wall' : block === WALL,
+            'coin' : block === COIN,
+            'road' : block === ROAD,
+            'bonus-coin' : block === BIG_COIN,
+            'ghost-pink' : block === ghostPink.marker,
+            'ghost-orange' : block === ghostOrange.marker,
+            'ghost-green' : block === ghostGreen.marker,
+            'ghost-blue' : block === ghostBlue.marker,
+            'ghost-eatable' : block === 10,
+            'pacman' : block === pacman.marker
           }" [ngStyle]="
-            {'background-image': block === 5 ? (
-              pacmanMove === 1 ? 'url('+'/assets/images-pacman/images/pacman-up.png'+')' : (
-                pacmanMove === 2 ? 'url('+'/assets/images-pacman/images/pacman-right.png'+')' : (
-                  pacmanMove === 3 ? 'url('+'/assets/images-pacman/images/pacman-down.png'+')' : (
-                    pacmanMove === 4 ? 'url('+'/assets/images-pacman/images/pacman-left.png'+')' : (
-                      pacmanMove === 5 ? 'url('+'/assets/images-pacman/gifs/pacman-eating.gif'+')' : ''
+            {'background-image': block === pacman.marker ? (
+              pacman.dir === 'up' ? 'url('+'/assets/images-pacman/images/pacman-up.png'+')' : (
+                pacman.dir === 'right' ? 'url('+'/assets/images-pacman/images/pacman-right.png'+')' : (
+                  pacman.dir === 'down' ? 'url('+'/assets/images-pacman/images/pacman-down.png'+')' : (
+                    pacman.dir === 'left' ? 'url('+'/assets/images-pacman/images/pacman-left.png'+')' : (
+                      pacman.dir === 'eating' ? 'url('+'/assets/images-pacman/gifs/pacman-eating.gif'+')' : ''
                     )
                   )
                 )
@@ -25,11 +29,3 @@
   </section>
 </div>
 <h1>Total Score {{totalScore}}</h1>
-<!-- 
-    0 ==> Wall
-    1 ==> Small coin
-    2 ==> Road
-    4 ==> Big coin
-    3 ==> Ghost
-    // 1 ==> up, 2==>right, 3==>down, 4==>left , 5==>eating a gif
-   -->

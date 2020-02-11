@@ -3,7 +3,7 @@
         <ul>
             <li (click)='showDetails()'><span>SHOW RULES</span></li>
             <li (click)='getRandomGame()'><span>GENERATE LEVEL</span></li>
-            <li (click)='submitLevel()'><span>SUBMIT LEVEL</span></li>
+            <li><span>HIGH SCORE: {{highScore|async}}</span></li>
             <li (click)='clear()'><span>CLEAR BOARD</span></li>
             <li (click)='check()'><span>KILL IT</span></li>
         </ul>
@@ -20,7 +20,7 @@
         </table>
 
     </div>
-</div> 
+</div>
 
 <!-- 8	1	5	3	4	2	6	9	7
 2	3	6	8	7	9	4	5	1

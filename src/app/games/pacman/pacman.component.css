@@ -60,8 +60,14 @@
     background-repeat: no-repeat;
 }
 
-.ghost-red {
-    background-image: url('/assets/images-pacman/images/life_red.png');
+.ghost-green {
+    background-image: url('/assets/images-pacman/images/ghost_green.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.ghost-eatable {
+    background-image: url('/assets/images-pacman/images/pacman-blue-ghost-png-10.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
 }

@@ -2,12 +2,10 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
 import { MatDialog } from '@angular/material/dialog';
 import { StartGameComponent } from './popups/start-game/start-game.component';
+import { PacmanDieComponent } from './popups/pacman-die/pacman-die.component';
+import { IGhost } from './interfaces/ghost';
+import { IPacman } from './interfaces/pacman';
 
-
-export interface IFrameData {
-  frameStartTime: number;
-  deltaTime: number;
-}
 
 @Component({
   selector: 'app-pacman',
@@ -15,234 +13,397 @@ export interface IFrameData {
   styleUrls: ['./pacman.component.css']
 })
 export class PacmanComponent implements OnInit {
-  title = 'Pacman Game';
   gameFinished: boolean = false;
+  ghostEatableTimer: number;
+
   gameMap: Array<number[]>;
-  initPacmanX: number; initPacmanY: number;
+  initialMap: Array<number[]>;
 
   readonly WALL: number = 0;
   readonly PACMAN: number = 5;
   readonly ROAD: number = 2;
-
-  readonly EAT_COIN: number = 1;
-  readonly EAT_BIG_COIN: number = 4;
-  readonly GHOST: number = 3;
+  readonly COIN: number = 1;
+  readonly BIG_COIN: number = 4;
+  readonly EAT_TIMER: number = 20;
 
   totalScore: number = 0;
-  readonly eatCoin: number = 2;
-  readonly eatBigCoin = 4;
+  lives = 3;
 
-  pacmanMove: number = 2; // 1 ==> up, 2==>right, 3==>down, 4==>left
-  ghostMeetWall: boolean = false;
 
-  //Ghost properties
-  ghostY: number; ghostX: number;
-  ghostCrashed: boolean = false;
-  ghostLast: string;
+  public pacman: IPacman = {
+    dir: 'left',
+    marker: 5,
+  }
 
-  private movingDir: number = 38;
-  faceWall: boolean = false;
+  //Ghosts properties
+  ghostOrange: IGhost = {
+    marker: 6,
+    color: 'orange',
+    prevBlock: this.ROAD,
+    eatable: false,
+  }
+
+  ghostPink: IGhost = {
+    marker: 7,
+    color: 'pink',
+    prevBlock: this.ROAD,
+    eatable: false,
+
+  }
+
+  ghostGreen: IGhost = {
+    marker: 8,
+    color: 'green',
+    prevBlock: this.ROAD,
+    eatable: false,
+
+  }
+
+  ghostBlue: IGhost = {
+    marker: 9,
+    color: 'blue',
+    prevBlock: this.ROAD,
+    eatable: false,
+
+  }
+
+  get ghostArr(): Array<IGhost> {
+    const arr = [];
+    arr.push(this.ghostPink);
+    arr.push(this.ghostOrange);
+    arr.push(this.ghostBlue);
+    arr.push(this.ghostGreen);
+    return arr;
+  }
+
+  // timer: NodeJS.Timer;
 
   constructor(
     public dialog: MatDialog,
     private services: PacmanService
   ) {
-    document.title = this.title;
+    this.initialMap = services.map;
     this.gameMap = services.map;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     let map = this.gameMap;
     //Initial pacman coordinate (20,8)
 
     const dialogRef = this.dialog.open(StartGameComponent, {});
     dialogRef.componentInstance.onClose.subscribe((res) => {
       for (let i = 0; i < map.length; i++) {
-        for (let j = 0; j < map[i]['length']; j++) {
-          if (map[i][j] === 5) {
-            this.initPacmanX = i;
-            this.initPacmanY = j;
+        for (let j = 0; j < map[i].length; j++) {
+          if (map[i][j] === this.pacman.marker) {
+            this.pacman.x = i;
+            this.pacman.y = j;
           }
         }
       }
 
       for (let i = 0; i < this.gameMap.length; i++) {
-        for (let j = 0; j < this.gameMap[i]['length']; j++) {
-          if (this.gameMap[i][j] == 3) {
-            this.ghostX = i;
-            this.ghostY = j;
+        for (let j = 0; j < this.gameMap[i].length; j++) {
+          if (this.gameMap[i][j] === 6) {
+            this.ghostOrange.x = i;
+            this.ghostOrange.y = j;
+          } else if (this.gameMap[i][j] === 7) {
+            this.ghostPink.x = i;
+            this.ghostPink.y = j;
+          } else if (this.gameMap[i][j] === 8) {
+            this.ghostGreen.x = i;
+            this.ghostGreen.y = j;
+          } else if (this.gameMap[i][j] === 9) {
+            this.ghostBlue.x = i;
+            this.ghostBlue.y = j;
           }
         }
       }
       this.dialog.closeAll();
+      // this.loop();
+      // this.timer = 
       setInterval(this.loop.bind(this), 250);
       //TODO: Replace interval with Observable
     })
-
   }
 
-  loop() {
-    this.moveDir(this.movingDir);
-    this.ghostRun(this.ghostX, this.ghostY);
+  loop(): void {
+    this.pacmanRun(this.pacman);
+    this.ghostRun(this.ghostBlue);
+    // this.ghostRun(this.ghostOrange);
+    // this.ghostRun(this.ghostPink);
+    // this.ghostRun(this.ghostGreen);
+    if (this.ghostEatableTimer) {
+      this.ghostEatableTimer--;
+      if (this.ghostEatableTimer === 0) {
+        this.changeEatable(this.ghostArr, false);
+      }
+    }
   }
 
   //! Pacman moves;
-  //Returns 'wall'if the direction given is towards wall
-  moveDir(code): string | void {
-    const dirObj = {
-      '37': {
-        nextBlock: this.initPacmanY - 1,
-        nextFace: 4,
-        move: () => this.initPacmanY -= 1
-      },
-      '38': {
-        nextBlock: this.initPacmanX - 1,
-        nextFace: 1,
-        move: () => this.initPacmanX -= 1
-      },
-      '39': {
-        nextBlock: this.initPacmanY + 1,
-        nextFace: 2,
-        move: () => this.initPacmanY += 1
-      },
-      '40': {
-        nextBlock: this.initPacmanX + 1,
-        nextFace: 3,
-        move: () => this.initPacmanX += 1
-      },
-    }
-
-    let nextDirId = dirObj[code].nextBlock;
-
-    const nextBox = code === 38 || code === 40 ?
-      this.gameMap[nextDirId][this.initPacmanY] :
-      this.gameMap[this.initPacmanX][nextDirId]
-
-
-    if (nextBox === this.WALL) {
-      return 'wall';
-    } else {
-      //Change face 
-      this.scoreUpdate(nextBox);//For updating score
-      this.pacmanMove = dirObj[code].nextFace;//Setting pacman's face towards the dir he is going
-      this.pacmanMoved(this.initPacmanX, this.initPacmanY); //Replacing pacman box with nothing
-
-      if (nextDirId === -1) {
-        if (code === 38) {
-          this.initPacmanX = this.gameMap.length - 1;
-        } else if (code === 37) {
-          this.initPacmanY = this.gameMap[this.initPacmanY]['length'] - 1;//Setting pacman's new position to right end of map
-        }
-
-      } else if (nextDirId === this.gameMap.length) {
-        //Reached down end
-        this.initPacmanX = 0;
-      } else if (nextDirId === this.gameMap[0].length && code === 39) {
-        //Reached right end
-        this.initPacmanY = 0;
-      } else {
-        dirObj[code].move();
-      }
-
-      if (!this.gameFinished) {
-        this.gameMap[this.initPacmanX][this.initPacmanY] = this.PACMAN;
-      }
-    }
-  }
 
   @HostListener('window:keydown', ['$event'])
-  controlKeyboardEvent(event) {
+  controlKeyboardEvent(event): void {
     event.preventDefault();
-    const code = event.keyCode;
+    const code = Number(event.keyCode);
+    const validCodes = {
+      37: 'left',
+      38: 'up',
+      39: 'right',
+      40: 'down',
+    }
 
-    if (code === 37 || code === 38 || code === 39 || code === 40) {
-      if (code !== this.movingDir) {
-        if (this.moveDir(code) !== 'wall') {
-          this.movingDir = code;
+    const dir = validCodes[code];
+
+    if (dir && dir !== this.pacman.dir) {
+      this.pacman.dir = dir;
+    }
+  }
+
+  pacmanRun(pac): string | void {
+    //Calculate next box
+    pac.next = this.findNext(pac);
+
+    //Validate nextBox
+    this.checkNextBox(pac);
+
+    if (!pac.wall) {
+      //Move Pacman
+      this.movePacman(pac);
+    }
+  }
+
+  findNext(pac): IPacman['next'] {
+    const x = pac.dir === 'up'
+      ? pac.x - 1
+      : pac.dir === 'down'
+        ? pac.x + 1
+        : pac.x;
+    const y = pac.dir === 'left'
+      ? pac.y - 1
+      : pac.dir === 'right'
+        ? pac.y + 1
+        : pac.y;
+
+    return {
+      x,
+      y,
+      value: this.gameMap[x][y],
+    }
+  }
+
+  checkNextBox(pac): void {
+    const val = pac.next.value;
+    //Going in wall
+    if (val === this.WALL) {
+      pac.wall = true;
+      return;
+    }
+
+    pac.wall = false;
+
+    const ghostMerkersArr: number[] = [6, 7, 8, 9]
+    //Going in ghost(eatable)
+    if (val === 10) {
+      this.totalScore += 50;
+      this.pacmanEatsGhost(
+        //Finding which ghost we eat
+        this.ghostArr.find((ghost) => {
+          return ghost.x === pac.next.x
+            && ghost.y === pac.next.y
+        })
+      );
+      return;
+    }
+    //Going in ghost(uneatable)
+    if (ghostMerkersArr.includes(val)) {
+      this.ghostEatsPacman()
+      return;
+    }
+
+    //Going in normal coin
+    if (val === this.COIN) {
+      this.totalScore += this.COIN;
+    }
+    //Going in BIG coin
+    if (val === this.BIG_COIN) {
+      this.totalScore += this.BIG_COIN;
+      this.ghostEatableTimer = this.EAT_TIMER;
+      this.changeEatable(this.ghostArr, true);
+    }
+  }
+
+  movePacman(pac) {
+    //Placing road behind pacman
+    this.gameMap[pac.x][pac.y] = this.ROAD;
+
+    //Validating for extremes
+
+    const xLength: number = this.gameMap.length;
+    const yLength: number = this.gameMap[pac.x].length;
+
+    if (pac.dir === 'left'
+      && pac.next.y === -1) {
+      pac.next.y = yLength - 1;
+    } else if (pac.dir === 'right'
+      && pac.next.y === yLength) {
+      pac.next.y = 0;
+    } else if (pac.dir === 'up'
+      && pac.next.x === -1) {
+      pac.next.x = xLength - 1;
+    } else if (pac.dir === 'down'
+      && pac.next.x === xLength) {
+      pac.next.x = 0;
+    }
+
+    //Changing cordinates in the obj and removing next
+    pac.x = pac.next.x;
+    pac.y = pac.next.y;
+    delete pac.next;
+
+    //Moving Pacman
+    this.gameMap[pac.x][pac.y] = pac.marker;
+    //Replacing the copy of the map with road;
+    // this.initialMap[pac.x][pac.y] = this.ROAD;
+  }
+
+  //! Methods for both
+
+  changeEatable(ghostArr: Array<IGhost>, eat: boolean): void {
+    for (let ghost of ghostArr) {
+      if (eat) {
+        ghost.eatable = true;
+        ghost.marker = 10;
+      } else {
+        const markerObj = {
+          'orange': 6,
+          'pink': 7,
+          'green': 8,
+          'blue': 9,
         }
+        ghost.eatable = false;
+        ghost.marker = markerObj[ghost.color];
       }
     }
-    return
   }
 
-  pacmanMoved(x, y) {
-    this.gameMap[x][y] = this.ROAD; //Replacing the pacman with black block
+  pacmanEatsGhost(g): void {
+    //Todo : Eat ghost
   }
 
-  scoreUpdate(step) {
-    if (step == this.EAT_COIN) {
-      this.totalScore = this.totalScore + this.eatCoin;
-    } else if (step == this.EAT_BIG_COIN) {
-      //Todo big coin makes ghost eatable
-      this.totalScore = this.totalScore + this.eatBigCoin;
+  ghostEatsPacman(): void {
+    //Todo: Eat Pacman
+
+    this.lives--;
+    if (this.lives === 0) {
+      // clearInterval(this.timer);
+      this.dialog.open(PacmanDieComponent, {});
     }
-
   }
 
   //! Ghost moves;
 
-  timeInterVal;
-  ghostRun(gx, gy) {
-    console.log('Ghost started run!');
-
-    let moves: string[] = this.findOpenPath(gx, gy);
+  ghostRun(g: IGhost): void {
+    let moves: string[] = this.findOpenPath(g);
 
     let moveId = this.generateRandomNumber(0, moves.length);
     let move = moves[moveId];
     let oposite = this.findOpposite(move);
 
-    if ((gx < this.initPacmanX) && (gy < this.initPacmanY)) {
-      console.log('Pacman is now down-right of ghost');
-      if (moves.includes('down') || moves.includes('right') && (move !== this.ghostLast)) {
-        moves = moves.filter((el) => el === 'down' || el === 'right');
-      }
-    } else if ((gx <= this.initPacmanX) && (gy >= this.initPacmanY)) {
-      //When pacman located down-left on map respect to ghost's current position
-      if (moves.includes('left') || moves.includes('down') && (move !== this.ghostLast)) {
-        moves = moves.filter((el) => el === 'down' || el === 'left');
-      }
-    } else if ((gx >= this.initPacmanX) && (gy <= this.initPacmanY)) {
-      //When pacman located up-right on map respect to ghost's current position
-      if (moves.includes('up') || moves.includes('right') && (move !== this.ghostLast)) {
-        moves = moves.filter((el) => el === 'up' || el === 'right');
-      }
-    } else if ((gx >= this.initPacmanX) && (gy >= this.initPacmanY)) {
-      //When pacman located up-left on map respect to ghost's current position
-      if (moves.includes('left') || moves.includes('up') && (move !== this.ghostLast)) {
-        moves = moves.filter((el) => el === 'up' || el === 'left');
-      }
-    }
+    moves = this.filterMoves(moves, g, move);
 
-    if (move === this.ghostLast) {
+    if (move === g.last) {
       moves = moves.filter((el) => el !== move);
       moveId = this.generateRandomNumber(0, moves.length);
       move = moves[moveId];
       oposite = this.findOpposite(move);
     }
 
-    this.ghostMovement(move);
-    this.ghostLast = oposite;
+    this.ghostMovement(move, g);
+    g.last = oposite;
   }
 
-  findOpenPath(gx, gy): string[] {
+  filterMoves(moves: string[], g: IGhost, currMove): string[] {
+    if ((g.x < this.pacman.x) && (g.y < this.pacman.y)) {
+      // When pacman is down-right of ghost
+      if (moves.includes('down') || moves.includes('right') && (currMove !== g.last)) {
+        //If ghost chases pacman
+        if (!g.eatable) {
+          moves = moves.filter((el) => el === 'down' || el === 'right');
+        } else {
+          //If pacman chases ghost
+          moves = moves.filter((el) => el === 'up' || el === 'left');
+        }
+      }
+    } else if ((g.x <= this.pacman.x) && (g.y >= this.pacman.y)) {
+      //When pacman located down-left on map respect to ghost's current position
+      if (moves.includes('left') || moves.includes('down') && (currMove !== g.last)) {
+        //If ghost chases pacman
+        if (!g.eatable) {
+          moves = moves.filter((el) => el === 'down' || el === 'left');
+        } else {
+          //If pacman chases ghost
+          moves = moves.filter((el) => el === 'up' || el === 'right');
+        }
+      }
+    } else if ((g.x >= this.pacman.x) && (g.y <= this.pacman.y)) {
+      //When pacman located up-right on map respect to ghost's current position
+      if (moves.includes('up') || moves.includes('right') && (currMove !== g.last)) {
+        //If ghost chases pacman
+        if (!g.eatable) {
+          moves = moves.filter((el) => el === 'up' || el === 'right');
+        } else {
+          //If pacman chases ghost
+          moves = moves.filter((el) => el === 'down' || el === 'left');
+        }
+      }
+    } else if ((g.x >= this.pacman.x) && (g.y >= this.pacman.y)) {
+      //When pacman located up-left on map respect to ghost's current position
+      if (moves.includes('left') || moves.includes('up') && (currMove !== g.last)) {
+        //If ghost chases pacman
+        if (!g.eatable) {
+          moves = moves.filter((el) => el === 'up' || el === 'left');
+        } else {
+          //If pacman chases ghost
+          moves = moves.filter((el) => el === 'down' || el === 'right');
+        }
+      }
+    }
+    return moves
+  }
+
+  findOpenPath(g: IGhost): string[] {
+    //Todo: Make it smaller
     const freeDirArr = [];
-    if (this.gameMap[gx - 1][gy] !== this.WALL) {
+    if (this.gameMap[g.x - 1][g.y] === this.ROAD
+      || this.gameMap[g.x - 1][g.y] === this.COIN
+      || this.gameMap[g.x - 1][g.y] === this.BIG_COIN
+      || this.gameMap[g.x - 1][g.y] === this.PACMAN) {
       freeDirArr.push('up');
     }
-    if (this.gameMap[gx][gy + 1] !== this.WALL) {
+    if (this.gameMap[g.x][g.y + 1] === this.ROAD
+      || this.gameMap[g.x][g.y + 1] === this.COIN
+      || this.gameMap[g.x][g.y + 1] === this.BIG_COIN
+      || this.gameMap[g.x][g.y + 1] === this.PACMAN) {
       freeDirArr.push('right');
     }
-    if (this.gameMap[gx + 1][gy] !== this.WALL) {
+    if (this.gameMap[g.x + 1][g.y] === this.ROAD
+      || this.gameMap[g.x + 1][g.y] === this.COIN
+      || this.gameMap[g.x + 1][g.y] === this.BIG_COIN
+      || this.gameMap[g.x + 1][g.y] === this.PACMAN) {
       freeDirArr.push('down');
     }
-    if (this.gameMap[gx][gy - 1] !== this.WALL) {
+    if (this.gameMap[g.x][g.y - 1] === this.ROAD
+      || this.gameMap[g.x][g.y - 1] === this.COIN
+      || this.gameMap[g.x][g.y - 1] === this.BIG_COIN
+      || this.gameMap[g.x][g.y - 1] === this.PACMAN) {
       freeDirArr.push('left');
     }
 
     return freeDirArr;
   }
 
-  findOpposite(move) {
+  findOpposite(move): string {
     if (move === 'up') {
       return 'down'
     } else if (move === 'right') {
@@ -254,19 +415,19 @@ export class PacmanComponent implements OnInit {
     }
   }
 
-  ghostMovement(move) {
+  ghostMovement(move, g): void {
     if (move === 'up') {
       //move up
-      this.moveUp();
+      this.moveUp(g);
     } else if (move === 'right') {
       //move right
-      this.moveRight();
+      this.moveRight(g);
     } else if (move === 'down') {
       //move down
-      this.moveDown();
+      this.moveDown(g);
     } else if (move === 'left') {
       //move left
-      this.moveLeft();
+      this.moveLeft(g);
     }
   }
 
@@ -276,152 +437,96 @@ export class PacmanComponent implements OnInit {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  prevCoin;
-  ghostMoved(x, y) {
-    this.gameMap[x][y] = this.prevCoin;
+  ghostPlaceRoad(g: IGhost): void {
+    this.gameMap[g.x][g.y] = g.prevBlock;
   }
 
-  ghostMoveAction(dir, ghost) {
-    const moveObj = {
-      'up': {
-
-      },
-      'down': {
-
-      },
-      'right': {
-
-      },
-      'left': {
-
-      }
-    };
-    const ghostsObj = {
-
-    };
-  }
-
-  moveUp() {
-    console.log('moveUp');
-    if (this.ghostX == 0) {
-      console.log('Ghost reach extreme up of map');
-      this.moveDown();
+  moveUp(g: IGhost): void {
+    if (g.x === 0) {
+      g.last = 'up';
+      this.moveDown(g);
     } else {
-
-      let nextUp = this.gameMap[this.ghostX - 1][this.ghostY];
-      if (nextUp == this.WALL) {
-        this.ghostMeetWall = true;
-      } else {
-        this.ghostMoved(this.ghostX, this.ghostY);
-        if (nextUp == this.EAT_COIN) {
-          this.prevCoin = this.EAT_COIN;
-        } else if (nextUp == this.EAT_BIG_COIN) {
-          this.prevCoin = this.EAT_BIG_COIN;
-        } else if (nextUp == this.PACMAN) {
-          this.gameFinished = true;
-          clearInterval(this.timeInterVal);
-        } else {
-          this.prevCoin = this.ROAD;
-        }
-        this.newPositionGhost(this.ghostX - 1, this.ghostY);
-
-        this.ghostX--;
-        this.ghostMeetWall = false;
+      let nextUp = this.gameMap[g.x - 1][g.y];
+      this.ghostPlaceRoad(g);
+      if (nextUp === this.ROAD) {
+        g.prevBlock = this.ROAD
+      } else if (nextUp === this.COIN) {
+        g.prevBlock = this.COIN;
+      } else if (nextUp === this.BIG_COIN) {
+        g.prevBlock = this.BIG_COIN;
       }
+      this.newPositionGhost(g.x - 1, g.y, g);
+    }
+  }
+  moveRight(g: IGhost): void {
+    if (g.y === this.gameMap[g.x].length - 1) {
+      g.last = 'right';
+      this.moveLeft(g);
+    } else {
+      let nextUp = this.gameMap[g.x][g.y + 1];
+      this.ghostPlaceRoad(g);
+      if (nextUp === this.ROAD) {
+        g.prevBlock = this.ROAD
+      } else if (nextUp === this.COIN) {
+        g.prevBlock = this.COIN;
+      } else if (nextUp === this.BIG_COIN) {
+        g.prevBlock = this.BIG_COIN;
+      }
+      this.newPositionGhost(g.x, g.y + 1, g);
+    }
+  }
+  moveDown(g: IGhost): void {
+    if (g.x === this.gameMap.length - 1) {
+      g.last = 'down';
+      this.moveUp(g);
+    } else {
+      let nextUp = this.gameMap[g.x + 1][g.y];
+      this.ghostPlaceRoad(g);
+      if (nextUp === this.ROAD) {
+        g.prevBlock = this.ROAD
+      } else if (nextUp === this.COIN) {
+        g.prevBlock = this.COIN;
+      } else if (nextUp === this.BIG_COIN) {
+        g.prevBlock = this.BIG_COIN;
+      }
+      this.newPositionGhost(g.x + 1, g.y, g);
+    }
+  }
+  moveLeft(g: IGhost): void {
+    if (g.y === 0) {
+      g.last = 'left';
+      this.moveRight(g);
+    } else {
+      let nextUp = this.gameMap[g.x][g.y - 1];
+      this.ghostPlaceRoad(g);
+      if (nextUp === this.ROAD) {
+        g.prevBlock = this.ROAD
+      } else if (nextUp === this.COIN) {
+        g.prevBlock = this.COIN;
+      } else if (nextUp === this.BIG_COIN) {
+        g.prevBlock = this.BIG_COIN;
+      }
+      this.newPositionGhost(g.x, g.y - 1, g);
     }
   }
 
-  moveRight() {
-    console.log('moveRight');
-    if (this.ghostY == this.gameMap[this.ghostY]['length'] - 1) {
-      console.log('Ghost reach extreme right of map');
-      this.moveLeft();
-    } else {
-      let nextUp = this.gameMap[this.ghostX][this.ghostY + 1];
-      if (nextUp == this.WALL) {
-        this.ghostMeetWall = true;
-
-      } else {
-        this.ghostMoved(this.ghostX, this.ghostY);
-        if (nextUp == this.EAT_COIN) {
-          this.prevCoin = this.EAT_COIN;
-        } else if (nextUp == this.EAT_BIG_COIN) {
-          this.prevCoin = this.EAT_BIG_COIN;
-        } else if (nextUp == this.PACMAN) {
-          this.gameFinished = true;
-          clearInterval(this.timeInterVal);
-        } else {
-          this.prevCoin = this.ROAD;
-        }
-        this.newPositionGhost(this.ghostX, this.ghostY + 1);
-
-        this.ghostY++;
-        this.ghostMeetWall = false;
-      }
-    }
+  newPositionGhost(newX: number, newY: number, g: IGhost): void {
+    this.checkColapseWithPacman(g);
+    g.x = newX;
+    g.y = newY;
+    this.checkColapseWithPacman(g);
+    this.gameMap[newX][newY] = g.marker;
   }
 
-  moveDown() {
-    console.log('moveDown');
-    if (this.ghostX == this.gameMap.length - 1) {
-      console.log('Ghost reach extreme down of map');
-      this.moveUp
-    } else {
-
-      let nextUp = this.gameMap[this.ghostX + 1][this.ghostY];
-
-      if (nextUp == this.WALL) {
-        this.ghostMeetWall = true;
+  checkColapseWithPacman(g): void {
+    if (g.x === this.pacman.x && g.y === this.pacman.y) {
+      if (g.eatable) {
+        //Pacman eats ghost
+        this.pacmanEatsGhost(g);
       } else {
-        this.ghostMoved(this.ghostX, this.ghostY);
-        if (nextUp == this.EAT_COIN) {
-          this.prevCoin = this.EAT_COIN;
-        } else if (nextUp == this.EAT_BIG_COIN) {
-          this.prevCoin = this.EAT_BIG_COIN;
-        } else if (nextUp == this.PACMAN) {
-          this.gameFinished = true;
-          clearInterval(this.timeInterVal);
-        } else {
-          this.prevCoin = this.ROAD;
-        }
-        this.newPositionGhost(this.ghostX + 1, this.ghostY);
-
-        this.ghostX++;
-        this.ghostMeetWall = false;
+        //Ghost eats pacman
+        this.ghostEatsPacman();
       }
     }
-  }
-
-  moveLeft() {
-    console.log('moveLeft');
-    if (this.ghostY == 0) {
-      console.log('Ghost reach extreme left of map');
-      this.moveRight();
-    } else {
-      let nextUp = this.gameMap[this.ghostX][this.ghostY - 1];
-      if (nextUp == this.WALL) {
-        this.ghostMeetWall = true;
-      } else {
-        this.ghostMoved(this.ghostX, this.ghostY);
-        if (nextUp == this.EAT_COIN) {
-          this.prevCoin = this.EAT_COIN;
-        } else if (nextUp == this.EAT_BIG_COIN) {
-          this.prevCoin = this.EAT_BIG_COIN;
-        } else if (nextUp == this.PACMAN) {
-          this.gameFinished = true;
-          clearInterval(this.timeInterVal);
-        } else {
-          this.prevCoin = this.ROAD;
-        }
-        this.newPositionGhost(this.ghostX, this.ghostY - 1);
-
-        this.ghostY--;
-        this.ghostMeetWall = false;
-      }
-    }
-  }
-
-  newPositionGhost(newX, newY): void {
-    this.gameMap[newX][newY] = 3;
   }
 }
