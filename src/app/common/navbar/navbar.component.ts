@@ -8,14 +8,14 @@ import { User } from '../../auth/user/services/iuser';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
   username: string;
 
   constructor(
     public authService: AuthService,
   ) { }
 
-  ngOnInit() {
+  ngDoCheck(): void  {    
     this.username = localStorage.username;
   }
 
