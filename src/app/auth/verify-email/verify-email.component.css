@@ -1,4 +1,16 @@
-*{
-    font-family: 'Press Start 2P',cursive;
+* {
+    font-family: 'Press Start 2P', cursive;
     font-size: medium;
+}
+
+.displayTable {
+    margin-top: 50px;
+    margin-bottom: 250px;
+    margin-left: 35%;
+    margin-right: 30%;
+    position: relative;
+}
+
+.redirectToLogin, .formGroup {
+    margin-top: 20px;
 }

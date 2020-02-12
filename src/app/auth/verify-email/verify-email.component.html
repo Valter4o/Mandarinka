@@ -8,10 +8,10 @@
         <p class="text-center">We have sent a confirmation email to <strong>{{user.email}}</strong>.</p>
         <p class="text-center">Please check your email and click on the link to verfiy your email address.</p>
       </div>
-      
+
       <!-- Calling SendVerificationMail() method using authService Api -->
       <div class="formGroup">
-        <button type="button" class="btn btnPrimary" (click)="authService.SendVerificationMail()">
+        <button type="button" mat-flat-button (click)="authService.SendVerificationMail()">
           <i class="fas fa-redo-alt"></i>
           Resend Verification Email
         </button>
@@ -20,7 +20,7 @@
     </div>
 
     <div class="redirectToLogin">
-      <span>Go back to?<a class="redirect" routerLink="/login"> Sign in</a></span>
+      <span>Go back to?<a class="redirect" mat-flat-button routerLink="/login"> Sign in</a></span>
     </div>
 
   </div>

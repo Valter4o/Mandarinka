@@ -17,17 +17,16 @@
       </div>
 
       <div class="formGroup">
-        <input type="button" class="btn btnPrimary" value="Sign Up"
-          (click)="authService.SignUp(userEmail.value, userPwd.value,userName.value)">
+        <button mat-flat-button color="primary"
+          (click)="authService.SignUp(userEmail.value, userPwd.value,userName.value)">Sign Up</button>
       </div>
 
       <div class="formGroup">
         <span class="or"><span class="orInner">Or</span></span>
       </div>
 
-      <!-- Continue with Google -->
       <div class="formGroup">
-        <button type="button" class="btn googleBtn" (click)="authService.GoogleAuth()">
+        <button mat-flat-button type="button" (click)="authService.GoogleAuth()">
           <i class="fab fa-google-plus-g"></i>
           Continue with Google
         </button>
@@ -36,7 +35,7 @@
     </div>
 
     <div class="redirectToLogin">
-      <span>Already have an account? <a class="redirect" href="login">Log In</a></span>
+      <span>Already have an account? <a class="redirect" href="login"  mat-flat-button color="primary">Log In</a></span>
     </div>
   </div>
 
