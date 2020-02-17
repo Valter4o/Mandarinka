@@ -3,6 +3,11 @@ import { RulesComponent } from './popups/rules/rules.component';
 import { MatDialog } from "@angular/material/dialog";
 import { LostBonusComponent } from './popups/lost-bonus/lost-bonus.component';
 import { WonBonusComponent } from './popups/won-bonus/won-bonus.component';
+<<<<<<< Updated upstream
+=======
+import { ScoreService } from '../../shared/score.service';
+import { AuthService } from '../../auth/authentication.service';
+>>>>>>> Stashed changes
 
 @Component({
   selector: 'app-bonus-game',
@@ -15,11 +20,34 @@ export class BonusGameComponent implements OnInit {
   indexes: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   history: string[] = [];
   nextBoxes: string[] = [];
+  username: string;
 
+<<<<<<< Updated upstream
   constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.rulesHandler();
+=======
+  constructor(
+    public dialog: MatDialog,
+    public scoreService: ScoreService,
+    public authService: AuthService,
+  ) { }
+
+  ngOnInit(): void {
+    this.rulesHandler();
+    this.username = localStorage.username;
+    this.highScore = JSON.parse(localStorage.getItem('playerScore'))['bonus'];
+  }
+
+  ngOnDestroy(): void {
+    this.updateScore();
+  }
+
+  updateScore() {
+    const uid = this.authService.userData.uid;
+    this.scoreService.updateScore(uid, 'bonus', this.highScore)
+>>>>>>> Stashed changes
   }
 
   rulesHandler() {

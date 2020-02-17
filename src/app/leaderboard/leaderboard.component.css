@@ -1,0 +1,17 @@
+table {
+    width: 100%;
+}
+
+h1{
+    color: indianred;
+}
+
+* {
+    font-family: 'Press Start 2P', cursive;
+}
+
+.container{
+    height: 500px;
+    background-image: url(/assets/images-common/Pattern\ Blue\ Background\ Minimalism\ wallpaper\ \ 4.jpg);
+    background-size: 100% 100%;
+}

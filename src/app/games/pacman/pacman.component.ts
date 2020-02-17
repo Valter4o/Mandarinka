@@ -2,6 +2,13 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
 import { MatDialog } from '@angular/material/dialog';
 import { StartGameComponent } from './popups/start-game/start-game.component';
+<<<<<<< Updated upstream
+=======
+import { PacmanDieComponent } from './popups/pacman-die/pacman-die.component';
+import { IGhost } from './interfaces/ghost';
+import { IPacman } from './interfaces/pacman';
+import { PacmanWinComponent } from './popups/pacman-win/pacman-win.component';
+>>>>>>> Stashed changes
 
 
 export interface IFrameData {
@@ -23,6 +30,46 @@ export class PacmanComponent implements OnInit {
   readonly WALL: number = 0;
   readonly PACMAN: number = 5;
   readonly ROAD: number = 2;
+<<<<<<< Updated upstream
+=======
+  readonly COIN: number = 1;
+  readonly BIG_COIN: number = 4;
+  readonly EAT_TIMER: number = 20;
+
+  totalScore: number = 0;
+  highScore: number;
+  lives = 3;
+  interval: any;
+  coins: number = 0;
+  bigCoins: number = 0;
+
+  public pacman: IPacman = {
+    dir: 'left',
+    marker: 5,
+  }
+
+  //Ghosts properties
+  ghostOrange: IGhost = {
+    marker: 6,
+    color: 'orange',
+    prevBlock: this.ROAD,
+    eatable: false,
+  }
+
+  ghostPink: IGhost = {
+    marker: 7,
+    color: 'pink',
+    prevBlock: this.ROAD,
+    eatable: false,
+
+  }
+
+  ghostGreen: IGhost = {
+    marker: 8,
+    color: 'green',
+    prevBlock: this.ROAD,
+    eatable: false,
+>>>>>>> Stashed changes
 
   readonly EAT_COIN: number = 1;
   readonly EAT_BIG_COIN: number = 4;
@@ -45,8 +92,9 @@ export class PacmanComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private services: PacmanService
+    private pacService: PacmanService
   ) {
+<<<<<<< Updated upstream
     document.title = this.title;
     this.gameMap = services.map;
   }
@@ -84,6 +132,28 @@ export class PacmanComponent implements OnInit {
   loop() {
     this.moveDir(this.movingDir);
     this.ghostRun(this.ghostX, this.ghostY);
+=======
+    this.initialMap = pacService.map;
+    this.gameMap = pacService.map;
+  }
+
+  ngOnInit(): void {
+    this.newGame();
+  }
+
+  loop(): void {
+    this.pacmanRun(this.pacman);
+    this.ghostRun(this.ghostBlue);
+    this.ghostRun(this.ghostOrange);
+    this.ghostRun(this.ghostPink);
+    this.ghostRun(this.ghostGreen);
+    if (this.ghostEatableTimer) {
+      this.ghostEatableTimer--;
+      if (this.ghostEatableTimer === 0) {
+        this.changeEatable(this.ghostArr, false);
+      }
+    }
+>>>>>>> Stashed changes
   }
 
   //! Pacman moves;
@@ -112,12 +182,84 @@ export class PacmanComponent implements OnInit {
       },
     }
 
+<<<<<<< Updated upstream
     let nextDirId = dirObj[code].nextBlock;
+=======
+    const dir = validCodes[code];
+
+    if (dir && dir !== this.pacman.dir) {
+      const pacCopy = { ...this.pacman }
+      pacCopy.dir = dir;
+      this.pacmanRun(pacCopy);
+      if (!pacCopy.wall) {
+        this.pacman.dir = dir;
+      }
+    }
+  }
+
+  pacmanRun(pac): string | void {
+    //Calculate next box
+    pac.next = this.findNext(pac);
+>>>>>>> Stashed changes
 
     const nextBox = code === 38 || code === 40 ?
       this.gameMap[nextDirId][this.initPacmanY] :
       this.gameMap[this.initPacmanX][nextDirId]
 
+<<<<<<< Updated upstream
+=======
+    if (!pac.wall) {
+      //Move Pacman
+      this.movePacman(pac);
+    }
+  }
+
+  findNext(pac): IPacman['next'] {
+    let x = pac.dir === 'up'
+      ? pac.x - 1
+      : pac.dir === 'down'
+        ? pac.x + 1
+        : pac.x;
+    let y = pac.dir === 'left'
+      ? pac.y - 1
+      : pac.dir === 'right'
+        ? pac.y + 1
+        : pac.y;
+
+    //Validating for extremes
+
+    const xLength: number = this.gameMap.length;
+    const yLength: number = this.gameMap[pac.x].length;
+
+    if (pac.dir === 'left'
+      && y === -1) {
+      y = yLength - 1;
+    } else if (pac.dir === 'right'
+      && y === yLength) {
+      y = 0;
+    } else if (pac.dir === 'up'
+      && x === -1) {
+      x = xLength - 1;
+    } else if (pac.dir === 'down'
+      && x === xLength) {
+      x = 0;
+    }
+
+    return {
+      x,
+      y,
+      value: this.gameMap[x][y],
+    }
+  }
+
+  checkNextBox(pac): void {
+    const val = pac.next.value;
+    //Going in wall
+    if (val === this.WALL) {
+      pac.wall = true;
+      return;
+    }
+>>>>>>> Stashed changes
 
     if (nextBox === this.WALL) {
       return 'wall';
@@ -134,6 +276,7 @@ export class PacmanComponent implements OnInit {
           this.initPacmanY = this.gameMap[this.initPacmanY]['length'] - 1;//Setting pacman's new position to right end of map
         }
 
+<<<<<<< Updated upstream
       } else if (nextDirId === this.gameMap.length) {
         //Reached down end
         this.initPacmanX = 0;
@@ -159,6 +302,55 @@ export class PacmanComponent implements OnInit {
       if (code !== this.movingDir) {
         if (this.moveDir(code) !== 'wall') {
           this.movingDir = code;
+=======
+    //Going in normal coin
+    if (val === this.COIN) {
+      this.coins--;
+      this.totalScore += this.COIN;
+      console.log(this.coins)
+      if (this.coins === 0 && this.bigCoins === 0) {
+        this.winGame();
+      }
+    }
+    //Going in BIG coin
+    if (val === this.BIG_COIN) {
+      this.bigCoins--;
+      this.totalScore += this.BIG_COIN;
+      this.ghostEatableTimer = this.EAT_TIMER;
+      this.changeEatable(this.ghostArr, true);
+    }
+  }
+
+  movePacman(pac) {
+    //Placing road behind pacman
+    this.gameMap[pac.x][pac.y] = this.ROAD;
+
+
+    //Changing cordinates in the obj and removing next
+    pac.x = pac.next.x;
+    pac.y = pac.next.y;
+    delete pac.next;
+
+    //Moving Pacman
+    this.gameMap[pac.x][pac.y] = pac.marker;
+    //Replacing the copy of the map with road;
+    // this.initialMap[pac.x][pac.y] = this.ROAD;
+  }
+
+  //! Game methods
+
+  changeEatable(ghostArr: Array<IGhost>, eat: boolean): void {
+    for (let ghost of ghostArr) {
+      if (eat) {
+        ghost.eatable = true;
+        ghost.marker = 20;
+      } else {
+        const markerObj = {
+          'orange': 6,
+          'pink': 7,
+          'green': 8,
+          'blue': 9,
+>>>>>>> Stashed changes
         }
       }
     }
@@ -169,14 +361,87 @@ export class PacmanComponent implements OnInit {
     this.gameMap[x][y] = this.ROAD; //Replacing the pacman with black block
   }
 
+<<<<<<< Updated upstream
   scoreUpdate(step) {
     if (step == this.EAT_COIN) {
       this.totalScore = this.totalScore + this.eatCoin;
     } else if (step == this.EAT_BIG_COIN) {
       //Todo big coin makes ghost eatable
       this.totalScore = this.totalScore + this.eatBigCoin;
+=======
+  ghostEatsPacman(): void {
+    this.lives--;
+    if (this.lives === 0) {
+      clearInterval(this.interval);
+      const dialogRef = this.dialog.open(PacmanDieComponent, {});
+      dialogRef.componentInstance.onClose.subscribe((_) => {
+        this.newGame();
+      })
+      this.resetPacman();
+>>>>>>> Stashed changes
     }
 
+  }
+
+  winGame():void {
+    clearInterval(this.interval);
+    const winDialog = this.dialog.open(PacmanWinComponent, {})
+    winDialog.componentInstance.onClose.subscribe((_) => {
+      this.newGame();
+    })
+  }
+
+  stopGame():void {
+    //Todo:stop the interval
+
+  }
+
+  resetPacman():void {
+    //When pacman dies once 
+
+  }
+
+  newGame():void {
+    this.dialog.closeAll();
+    delete this.gameMap;
+    this.gameMap = this.pacService.map;
+    let map = this.gameMap;
+
+    const dialogRef = this.dialog.open(StartGameComponent, {});
+    dialogRef.componentInstance.onClose.subscribe((res) => {
+      for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+          if (map[i][j] === this.pacman.marker) {
+            this.pacman.x = i;
+            this.pacman.y = j;
+          }
+        }
+      }
+
+      for (let i = 0; i < this.gameMap.length; i++) {
+        for (let j = 0; j < this.gameMap[i].length; j++) {
+          if (this.gameMap[i][j] === 6) {
+            this.ghostOrange.x = i;
+            this.ghostOrange.y = j;
+          } else if (this.gameMap[i][j] === 7) {
+            this.ghostPink.x = i;
+            this.ghostPink.y = j;
+          } else if (this.gameMap[i][j] === 8) {
+            this.ghostGreen.x = i;
+            this.ghostGreen.y = j;
+          } else if (this.gameMap[i][j] === 9) {
+            this.ghostBlue.x = i;
+            this.ghostBlue.y = j;
+          } else if (this.gameMap[i][j] === 1) {
+            this.coins++;
+          } else if (this.gameMap[i][j] === 4) {
+            this.bigCoins++;
+          }
+        }
+      }
+      this.dialog.closeAll();
+      this.interval = setInterval(this.loop.bind(this), 200);
+    })
   }
 
   //! Ghost moves;

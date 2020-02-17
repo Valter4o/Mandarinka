@@ -1,19 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-pacman-die',
   templateUrl: './pacman-die.component.html',
   styleUrls: ['./pacman-die.component.css']
 })
-export class PacmanDieComponent implements OnInit {
+export class PacmanDieComponent {
 
   constructor(
     public dialogRef: MatDialogRef<PacmanDieComponent>
   ) { }
 
-  ngOnInit() {
+  onClose: EventEmitter<any> = new EventEmitter();
+  
+  newGame() {
+    this.onClose.emit();
   }
-
-}
- 
+} 

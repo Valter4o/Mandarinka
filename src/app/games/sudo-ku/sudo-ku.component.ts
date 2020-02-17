@@ -7,7 +7,9 @@ import { Rules } from './popups/rules/rules.component';
 import { NotfinishedComponent } from './popups/game/notfinished/notfinished.component';
 import { LostComponent } from './popups/game/finished/lost/lost.component';
 import { WonComponent } from './popups/game/finished/won/won.component';
- 
+import { ScoreService } from '../../shared/score.service';
+import { AuthService } from '../../auth/authentication.service';
+
 @Component({
   selector: "app-sudo-ku",
   templateUrl: "./sudo-ku.component.html",
@@ -42,6 +44,8 @@ export class SudoKuComponent implements OnInit {
   private markedBox: ICellLocation = {};
   public creator: string;
   private gameDbId: string;
+  public highScore: number;
+  public score: number = 0;
 
   // private testGame: Array<Array<number>> = [
   //   [8, 1, 5, 3, 4, 2, 6, 9, 7],
@@ -57,13 +61,20 @@ export class SudoKuComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private service: SudokuServiceService
+    private service: SudokuServiceService,
+    public scoreService: ScoreService,
+    public authService: AuthService
   ) {
   }
 
+
+  //Hooks
+
   ngOnInit() {
     this.showDetails();
+    this.highScore = JSON.parse(localStorage.playerScore).sudoku;
   }
+
 
   //ADDING NUMBER
 
@@ -109,11 +120,9 @@ export class SudoKuComponent implements OnInit {
     this.dialog.open(Rules, {});
   }
 
-
   //GENERATE LEVEL
 
   getRandomGame(): void {
-
     this.service.getGame().subscribe(data => {
       const id = getRandomIntInclusive(0, data.length - 1);
       const gameData: any = data[id].payload.doc.data();
@@ -158,7 +167,7 @@ export class SudoKuComponent implements OnInit {
       row.map(cell => cell.value ? cell.static = true : cell);
     });
 
-    this.service.postGame(game, 'Valter')
+    this.service.postGame(game, localStorage.username)
 
     this.clear();
   }
@@ -260,6 +269,11 @@ export class SudoKuComponent implements OnInit {
 
     if (isReady && isDone) {
       this.dialog.open(WonComponent, {});
+
+      this.score += 10;
+      if (this.score > this.highScore) {
+        this.scoreService.updateScore(this.authService.userData.uid, 'sudoku', this.score);
+      }
     } else if (isDone) {
       this.dialog.open(LostComponent, {});
     }

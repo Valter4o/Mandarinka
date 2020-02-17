@@ -4,6 +4,10 @@ import { auth } from 'firebase/app';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from "@angular/router";
+<<<<<<< Updated upstream
+=======
+import { ScoreService } from '../shared/score.service';
+>>>>>>> Stashed changes
 
 @Injectable({
   providedIn: 'root'
@@ -26,9 +30,14 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(this.userData));
         JSON.parse(localStorage.getItem('user'));
       } else {
+<<<<<<< Updated upstream
         localStorage.setItem('user', null);
         JSON.parse(localStorage.getItem('user'));
       }
+=======
+        this.userData = null;
+      } 
+>>>>>>> Stashed changes
     })
   }
 
@@ -36,6 +45,16 @@ export class AuthService {
   SignIn(email, password) {
     return this.afAuth.auth.signInWithEmailAndPassword(email, password)
       .then((result) => {
+<<<<<<< Updated upstream
+=======
+        const uid = result.user.uid;
+        this.afs.doc(`usernames/${uid}`).snapshotChanges().subscribe(data => {
+          const username = (data.payload.data() as any).username;
+          localStorage.setItem('username', username);
+          this.score.createUser(username, uid);
+          this.score.saveScore(username);
+        })
+>>>>>>> Stashed changes
         this.ngZone.run(() => {
           this.router.navigate(['home']);
         });
@@ -94,10 +113,23 @@ export class AuthService {
        this.ngZone.run(() => {
           this.router.navigate(['home']);
         })
+<<<<<<< Updated upstream
       this.SetUserData(result.user);
     }).catch((error) => {
       window.alert(error)
     })
+=======
+        this.SetUserData(result.user);
+        this.afs.doc(`usernames/${result.user.uid}`).snapshotChanges().subscribe(data => {
+          const username = (data.payload.data() as any).username;
+          localStorage.setItem('username', username);
+          this.score.createUser(username, result.user.uid);
+          this.score.saveScore(username);
+        })
+      }).catch((error) => {
+        window.alert(error)
+      })
+>>>>>>> Stashed changes
   }
 
   /* Setting up user data when sign in with username/password, 
