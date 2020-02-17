@@ -5,6 +5,7 @@ import { StartGameComponent } from './popups/start-game/start-game.component';
 import { PacmanDieComponent } from './popups/pacman-die/pacman-die.component';
 import { IGhost } from './interfaces/ghost';
 import { IPacman } from './interfaces/pacman';
+import { PacmanWinComponent } from './popups/pacman-win/pacman-win.component';
 
 
 @Component({
@@ -24,11 +25,12 @@ export class PacmanComponent implements OnInit {
   readonly ROAD: number = 2;
   readonly COIN: number = 1;
   readonly BIG_COIN: number = 4;
-  readonly EAT_TIMER: number = 20;
+  readonly EAT_TIMER: number = 2000;
 
   totalScore: number = 0;
-  lives = 3;
   interval: any;
+  coinsCount: number = 0;
+  bigCoinsCount: number = 0;
 
   //Pacman
   public pacman: IPacman = {
@@ -49,7 +51,6 @@ export class PacmanComponent implements OnInit {
     color: 'pink',
     prevBlock: this.ROAD,
     eatable: false,
-
   }
 
   ghostGreen: IGhost = {
@@ -57,7 +58,6 @@ export class PacmanComponent implements OnInit {
     color: 'green',
     prevBlock: this.ROAD,
     eatable: false,
-
   }
 
   ghostBlue: IGhost = {
@@ -65,7 +65,13 @@ export class PacmanComponent implements OnInit {
     color: 'blue',
     prevBlock: this.ROAD,
     eatable: false,
+  }
 
+  markerObj = {
+    'orange': 6,
+    'pink': 7,
+    'green': 8,
+    'blue': 9,
   }
 
   get ghostArr(): Array<IGhost> {
@@ -89,11 +95,11 @@ export class PacmanComponent implements OnInit {
   loop(): void {
     let g = this.checkPositions(this.pacman, this.ghostArr);
     if (g === null) {
-      this.pacmanRun(this.pacman);
       this.ghostRun(this.ghostBlue);
-      // this.ghostRun(this.ghostOrange);
-      // this.ghostRun(this.ghostPink);
-      // this.ghostRun(this.ghostGreen);
+      this.pacmanRun(this.pacman);
+      this.ghostRun(this.ghostOrange);
+      this.ghostRun(this.ghostPink);
+      this.ghostRun(this.ghostGreen);
     } else {
       if (this.ghostBlue.eatable) {
         this.pacmanEatsGhost(g);
@@ -110,7 +116,8 @@ export class PacmanComponent implements OnInit {
   }
 
   newGame() {
-    this.gameMap = this.services.map;
+    this.dialog.closeAll();
+    this.gameMap = JSON.parse(JSON.stringify(this.services.map));
     let map = this.gameMap;
 
     const dialogRef = this.dialog.open(StartGameComponent, {});
@@ -148,6 +155,10 @@ export class PacmanComponent implements OnInit {
             this.ghostBlue.startX = i;
             this.ghostBlue.y = j;
             this.ghostBlue.startY = j;
+          } else if (this.gameMap[i][j] === 1) {
+            this.coinsCount++;
+          } else if (this.gameMap[i][j] === 4) {
+            this.bigCoinsCount++;
           }
         }
       }
@@ -167,11 +178,14 @@ export class PacmanComponent implements OnInit {
       39: 'right',
       40: 'down',
     }
-
     const dir = validCodes[code];
 
-    if (dir && dir !== this.pacman.dir) {
+    if (dir) {
       event.preventDefault();
+    }
+
+
+    if (dir && dir !== this.pacman.dir) {
 
       let copyPac: IPacman = JSON.parse(JSON.stringify(this.pacman));
       copyPac.dir = dir;
@@ -267,12 +281,18 @@ export class PacmanComponent implements OnInit {
     //Going in normal coin
     if (val === this.COIN) {
       this.totalScore += this.COIN;
+      this.coinsCount--;
     }
     //Going in BIG coin
     if (val === this.BIG_COIN) {
       this.totalScore += this.BIG_COIN;
       this.ghostEatableTimer = this.EAT_TIMER;
       this.changeEatable(this.ghostArr, true);
+      this.bigCoinsCount--;
+    }
+    //Check if no coins left
+    if (this.coinsCount === 0 && this.bigCoinsCount === 0) {
+      this.winGame();
     }
   }
 
@@ -299,30 +319,26 @@ export class PacmanComponent implements OnInit {
         ghost.eatable = true;
         ghost.marker = 10;
       } else {
-        const markerObj = {
-          'orange': 6,
-          'pink': 7,
-          'green': 8,
-          'blue': 9,
-        }
         ghost.eatable = false;
-        ghost.marker = markerObj[ghost.color];
+        ghost.marker = this.markerObj[ghost.color];
       }
     }
   }
 
-  pacmanEatsGhost(g): void {
-    //Todo : Eat ghost
+  pacmanEatsGhost(g: IGhost): void {
+    this.totalScore += 50;
+    g.x = g.startX;
+    g.y = g.startY;
+    g.eatable = false;
+    g.marker = this.markerObj[g.color];
   }
 
   ghostEatsPacman(): void {
-    //Todo: Eat Pacman
-
-    this.lives--;
-    if (this.lives === 0) {
-      // clearInterval(this.timer);
-      this.dialog.open(PacmanDieComponent, {});
-    }
+    clearInterval(this.interval);
+    const ref = this.dialog.open(PacmanDieComponent, {});
+    ref.componentInstance.onClose.subscribe((_) => {
+      this.newGame();
+    })
   }
 
   checkPositions(p: IPacman, gArr: IGhost[]): IGhost | null {
@@ -334,9 +350,19 @@ export class PacmanComponent implements OnInit {
     }
     return null;
   }
+
+  winGame() {
+    //Todo:Update high Score
+    const dialogRef = this.dialog.open(PacmanWinComponent, {});
+    dialogRef.componentInstance.onClose.subscribe((_) => {
+      this.newGame();
+    })
+  }
+
   //! Ghost moves;
 
   ghostRun(g: IGhost): void {
+
     let moves: string[] = this.findOpenPath(g);
 
     let moveId = this.generateRandomNumber(0, moves.length);
@@ -408,28 +434,37 @@ export class PacmanComponent implements OnInit {
   findOpenPath(g: IGhost): string[] {
     //Todo: Make it smaller
     const freeDirArr = [];
-    if (this.gameMap[g.x - 1][g.y] === this.ROAD
-      || this.gameMap[g.x - 1][g.y] === this.COIN
-      || this.gameMap[g.x - 1][g.y] === this.BIG_COIN
-      || this.gameMap[g.x - 1][g.y] === this.PACMAN) {
+
+    const nextUp = this.gameMap[g.x - 1] ? this.gameMap[g.x - 1][g.y] : null;
+    const nextRight = this.gameMap[g.x][g.y + 1];
+    const nextDown = this.gameMap[g.x + 1] ? this.gameMap[g.x + 1][g.y] : null;
+    const nextLeft = this.gameMap[g.x][g.y - 1];
+    if (nextUp === this.ROAD
+      || nextUp === this.COIN
+      || nextUp === this.BIG_COIN
+      || nextUp === this.PACMAN
+      && nextUp) {
       freeDirArr.push('up');
     }
-    if (this.gameMap[g.x][g.y + 1] === this.ROAD
-      || this.gameMap[g.x][g.y + 1] === this.COIN
-      || this.gameMap[g.x][g.y + 1] === this.BIG_COIN
-      || this.gameMap[g.x][g.y + 1] === this.PACMAN) {
+    if (nextRight === this.ROAD
+      || nextRight === this.COIN
+      || nextRight === this.BIG_COIN
+      || nextRight === this.PACMAN
+      && nextRight) {
       freeDirArr.push('right');
     }
-    if (this.gameMap[g.x + 1][g.y] === this.ROAD
-      || this.gameMap[g.x + 1][g.y] === this.COIN
-      || this.gameMap[g.x + 1][g.y] === this.BIG_COIN
-      || this.gameMap[g.x + 1][g.y] === this.PACMAN) {
+    if (nextDown === this.ROAD
+      || nextDown === this.COIN
+      || nextDown === this.BIG_COIN
+      || nextDown === this.PACMAN
+      && nextDown) {
       freeDirArr.push('down');
     }
-    if (this.gameMap[g.x][g.y - 1] === this.ROAD
-      || this.gameMap[g.x][g.y - 1] === this.COIN
-      || this.gameMap[g.x][g.y - 1] === this.BIG_COIN
-      || this.gameMap[g.x][g.y - 1] === this.PACMAN) {
+    if (nextLeft === this.ROAD
+      || nextLeft === this.COIN
+      || nextLeft === this.BIG_COIN
+      || nextLeft === this.PACMAN
+      && nextLeft) {
       freeDirArr.push('left');
     }
 
@@ -475,72 +510,52 @@ export class PacmanComponent implements OnInit {
   }
 
   moveUp(g: IGhost): void {
-    if (g.x === 0) {
-      g.last = 'up';
-      this.moveDown(g);
-    } else {
-      let nextUp = this.gameMap[g.x - 1][g.y];
-      this.ghostPlaceRoad(g);
-      if (nextUp === this.ROAD) {
-        g.prevBlock = this.ROAD
-      } else if (nextUp === this.COIN) {
-        g.prevBlock = this.COIN;
-      } else if (nextUp === this.BIG_COIN) {
-        g.prevBlock = this.BIG_COIN;
-      }
-      this.newPositionGhost(g.x - 1, g.y, g);
+    let nextUp = this.gameMap[g.x - 1][g.y];
+    this.ghostPlaceRoad(g);
+    if (nextUp === this.ROAD) {
+      g.prevBlock = this.ROAD
+    } else if (nextUp === this.COIN) {
+      g.prevBlock = this.COIN;
+    } else if (nextUp === this.BIG_COIN) {
+      g.prevBlock = this.BIG_COIN;
     }
+    this.newPositionGhost(g.x - 1, g.y, g);
   }
   moveRight(g: IGhost): void {
-    if (g.y === this.gameMap[g.x].length - 1) {
-      g.last = 'right';
-      this.moveLeft(g);
-    } else {
-      let nextUp = this.gameMap[g.x][g.y + 1];
-      this.ghostPlaceRoad(g);
-      if (nextUp === this.ROAD) {
-        g.prevBlock = this.ROAD
-      } else if (nextUp === this.COIN) {
-        g.prevBlock = this.COIN;
-      } else if (nextUp === this.BIG_COIN) {
-        g.prevBlock = this.BIG_COIN;
-      }
-      this.newPositionGhost(g.x, g.y + 1, g);
+    let nextUp = this.gameMap[g.x][g.y + 1];
+    this.ghostPlaceRoad(g);
+    if (nextUp === this.ROAD) {
+      g.prevBlock = this.ROAD
+    } else if (nextUp === this.COIN) {
+      g.prevBlock = this.COIN;
+    } else if (nextUp === this.BIG_COIN) {
+      g.prevBlock = this.BIG_COIN;
     }
+    this.newPositionGhost(g.x, g.y + 1, g);
   }
   moveDown(g: IGhost): void {
-    if (g.x === this.gameMap.length - 1) {
-      g.last = 'down';
-      this.moveUp(g);
-    } else {
-      let nextUp = this.gameMap[g.x + 1][g.y];
-      this.ghostPlaceRoad(g);
-      if (nextUp === this.ROAD) {
-        g.prevBlock = this.ROAD
-      } else if (nextUp === this.COIN) {
-        g.prevBlock = this.COIN;
-      } else if (nextUp === this.BIG_COIN) {
-        g.prevBlock = this.BIG_COIN;
-      }
-      this.newPositionGhost(g.x + 1, g.y, g);
+    let nextUp = this.gameMap[g.x + 1][g.y];
+    this.ghostPlaceRoad(g);
+    if (nextUp === this.ROAD) {
+      g.prevBlock = this.ROAD
+    } else if (nextUp === this.COIN) {
+      g.prevBlock = this.COIN;
+    } else if (nextUp === this.BIG_COIN) {
+      g.prevBlock = this.BIG_COIN;
     }
+    this.newPositionGhost(g.x + 1, g.y, g);
   }
   moveLeft(g: IGhost): void {
-    if (g.y === 0) {
-      g.last = 'left';
-      this.moveRight(g);
-    } else {
-      let nextUp = this.gameMap[g.x][g.y - 1];
-      this.ghostPlaceRoad(g);
-      if (nextUp === this.ROAD) {
-        g.prevBlock = this.ROAD
-      } else if (nextUp === this.COIN) {
-        g.prevBlock = this.COIN;
-      } else if (nextUp === this.BIG_COIN) {
-        g.prevBlock = this.BIG_COIN;
-      }
-      this.newPositionGhost(g.x, g.y - 1, g);
+    let nextUp = this.gameMap[g.x][g.y - 1];
+    this.ghostPlaceRoad(g);
+    if (nextUp === this.ROAD) {
+      g.prevBlock = this.ROAD
+    } else if (nextUp === this.COIN) {
+      g.prevBlock = this.COIN;
+    } else if (nextUp === this.BIG_COIN) {
+      g.prevBlock = this.BIG_COIN;
     }
+    this.newPositionGhost(g.x, g.y - 1, g);
   }
 
   newPositionGhost(newX: number, newY: number, g: IGhost): void {

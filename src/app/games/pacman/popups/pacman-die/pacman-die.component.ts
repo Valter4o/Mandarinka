@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -6,14 +6,16 @@ import { MatDialogRef } from '@angular/material/dialog';
   templateUrl: './pacman-die.component.html',
   styleUrls: ['./pacman-die.component.css']
 })
-export class PacmanDieComponent implements OnInit {
+export class PacmanDieComponent {
 
   constructor(
     public dialogRef: MatDialogRef<PacmanDieComponent>
   ) { }
 
-  ngOnInit() {
-  }
+  onClose: EventEmitter<any> = new EventEmitter();
 
+  newLevel() {
+    this.onClose.emit();
+  }
 }
  
