@@ -28,8 +28,9 @@ export class PacmanComponent implements OnInit {
 
   totalScore: number = 0;
   lives = 3;
+  interval: any;
 
-
+  //Pacman
   public pacman: IPacman = {
     dir: 'left',
     marker: 5,
@@ -76,62 +77,30 @@ export class PacmanComponent implements OnInit {
     return arr;
   }
 
-  // timer: NodeJS.Timer;
-
   constructor(
     public dialog: MatDialog,
     private services: PacmanService
-  ) {
-    this.initialMap = services.map;
-    this.gameMap = services.map;
-  }
+  ) { }
 
   ngOnInit(): void {
-    let map = this.gameMap;
-    //Initial pacman coordinate (20,8)
-
-    const dialogRef = this.dialog.open(StartGameComponent, {});
-    dialogRef.componentInstance.onClose.subscribe((res) => {
-      for (let i = 0; i < map.length; i++) {
-        for (let j = 0; j < map[i].length; j++) {
-          if (map[i][j] === this.pacman.marker) {
-            this.pacman.x = i;
-            this.pacman.y = j;
-          }
-        }
-      }
-
-      for (let i = 0; i < this.gameMap.length; i++) {
-        for (let j = 0; j < this.gameMap[i].length; j++) {
-          if (this.gameMap[i][j] === 6) {
-            this.ghostOrange.x = i;
-            this.ghostOrange.y = j;
-          } else if (this.gameMap[i][j] === 7) {
-            this.ghostPink.x = i;
-            this.ghostPink.y = j;
-          } else if (this.gameMap[i][j] === 8) {
-            this.ghostGreen.x = i;
-            this.ghostGreen.y = j;
-          } else if (this.gameMap[i][j] === 9) {
-            this.ghostBlue.x = i;
-            this.ghostBlue.y = j;
-          }
-        }
-      }
-      this.dialog.closeAll();
-      // this.loop();
-      // this.timer = 
-      setInterval(this.loop.bind(this), 250);
-      //TODO: Replace interval with Observable
-    })
+    this.newGame();
   }
 
   loop(): void {
-    this.pacmanRun(this.pacman);
-    this.ghostRun(this.ghostBlue);
-    // this.ghostRun(this.ghostOrange);
-    // this.ghostRun(this.ghostPink);
-    // this.ghostRun(this.ghostGreen);
+    let g = this.checkPositions(this.pacman, this.ghostArr);
+    if (g === null) {
+      this.pacmanRun(this.pacman);
+      this.ghostRun(this.ghostBlue);
+      // this.ghostRun(this.ghostOrange);
+      // this.ghostRun(this.ghostPink);
+      // this.ghostRun(this.ghostGreen);
+    } else {
+      if (this.ghostBlue.eatable) {
+        this.pacmanEatsGhost(g);
+      } else {
+        this.ghostEatsPacman();
+      }
+    }
     if (this.ghostEatableTimer) {
       this.ghostEatableTimer--;
       if (this.ghostEatableTimer === 0) {
@@ -140,11 +109,57 @@ export class PacmanComponent implements OnInit {
     }
   }
 
+  newGame() {
+    this.gameMap = this.services.map;
+    let map = this.gameMap;
+
+    const dialogRef = this.dialog.open(StartGameComponent, {});
+    dialogRef.componentInstance.onClose.subscribe((res) => {
+      for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+          if (map[i][j] === this.pacman.marker) {
+            this.pacman.x = i;
+            this.pacman.startX = i;
+            this.pacman.y = j;
+            this.pacman.startY = j;
+          }
+        }
+      }
+
+      for (let i = 0; i < this.gameMap.length; i++) {
+        for (let j = 0; j < this.gameMap[i].length; j++) {
+          if (this.gameMap[i][j] === 6) {
+            this.ghostOrange.x = i;
+            this.ghostOrange.startX = i;
+            this.ghostOrange.y = j;
+            this.ghostOrange.startY = j;
+          } else if (this.gameMap[i][j] === 7) {
+            this.ghostPink.x = i;
+            this.ghostPink.startX = i;
+            this.ghostPink.y = j;
+            this.ghostPink.startY = j;
+          } else if (this.gameMap[i][j] === 8) {
+            this.ghostGreen.x = i;
+            this.ghostGreen.startX = i;
+            this.ghostGreen.y = j;
+            this.ghostGreen.startY = j;
+          } else if (this.gameMap[i][j] === 9) {
+            this.ghostBlue.x = i;
+            this.ghostBlue.startX = i;
+            this.ghostBlue.y = j;
+            this.ghostBlue.startY = j;
+          }
+        }
+      }
+      this.dialog.closeAll();
+      this.interval = setInterval(this.loop.bind(this), 250);
+      //TODO: Replace interval with Observable
+    })
+  }
   //! Pacman moves;
 
   @HostListener('window:keydown', ['$event'])
   controlKeyboardEvent(event): void {
-    event.preventDefault();
     const code = Number(event.keyCode);
     const validCodes = {
       37: 'left',
@@ -156,7 +171,16 @@ export class PacmanComponent implements OnInit {
     const dir = validCodes[code];
 
     if (dir && dir !== this.pacman.dir) {
-      this.pacman.dir = dir;
+      event.preventDefault();
+
+      let copyPac: IPacman = JSON.parse(JSON.stringify(this.pacman));
+      copyPac.dir = dir;
+      copyPac.next = this.findNext(copyPac);
+      this.checkNextBox(copyPac);
+
+      if (!copyPac.wall) {
+        this.pacman.dir = dir;
+      }
     }
   }
 
@@ -174,16 +198,35 @@ export class PacmanComponent implements OnInit {
   }
 
   findNext(pac): IPacman['next'] {
-    const x = pac.dir === 'up'
+    let x = pac.dir === 'up'
       ? pac.x - 1
       : pac.dir === 'down'
         ? pac.x + 1
         : pac.x;
-    const y = pac.dir === 'left'
+    let y = pac.dir === 'left'
       ? pac.y - 1
       : pac.dir === 'right'
         ? pac.y + 1
         : pac.y;
+
+    //Validating for extremes
+
+    const xLength: number = this.gameMap.length;
+    const yLength: number = this.gameMap[0].length;
+
+    if (pac.dir === 'left'
+      && y === -1) {
+      y = yLength - 1;
+    } else if (pac.dir === 'right'
+      && y === yLength) {
+      y = 0;
+    } else if (pac.dir === 'up'
+      && x === -1) {
+      x = xLength - 1;
+    } else if (pac.dir === 'down'
+      && x === xLength) {
+      x = 0;
+    }
 
     return {
       x,
@@ -237,25 +280,6 @@ export class PacmanComponent implements OnInit {
     //Placing road behind pacman
     this.gameMap[pac.x][pac.y] = this.ROAD;
 
-    //Validating for extremes
-
-    const xLength: number = this.gameMap.length;
-    const yLength: number = this.gameMap[pac.x].length;
-
-    if (pac.dir === 'left'
-      && pac.next.y === -1) {
-      pac.next.y = yLength - 1;
-    } else if (pac.dir === 'right'
-      && pac.next.y === yLength) {
-      pac.next.y = 0;
-    } else if (pac.dir === 'up'
-      && pac.next.x === -1) {
-      pac.next.x = xLength - 1;
-    } else if (pac.dir === 'down'
-      && pac.next.x === xLength) {
-      pac.next.x = 0;
-    }
-
     //Changing cordinates in the obj and removing next
     pac.x = pac.next.x;
     pac.y = pac.next.y;
@@ -301,6 +325,15 @@ export class PacmanComponent implements OnInit {
     }
   }
 
+  checkPositions(p: IPacman, gArr: IGhost[]): IGhost | null {
+    for (let i = 0; i < gArr.length - 1; i++) {
+      const g = gArr[i];
+      if (g.x === p.x && g.y === p.y) {
+        return g;
+      }
+    }
+    return null;
+  }
   //! Ghost moves;
 
   ghostRun(g: IGhost): void {
