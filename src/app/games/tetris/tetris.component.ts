@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular
 import { ROWS, COLS, KEY, POINTS, BLOCK_SIZE, LEVEL, LINES_PER_LEVEL, COLORSDARKER, COLORSLIGHTER, COLORS } from "./constants";
 import { Piece, IPiece } from './piece.component';
 import { GameService } from './game.service';
+import { ScoreService } from '../../shared/score.service';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../auth/authentication.service';
 
 @Component({
   selector: 'app-tetris',
@@ -23,9 +26,15 @@ export class TetrisComponent implements OnInit {
   gameStarted: boolean;
   time: { start: number; elapsed: number; level: number };
   points: number;
-  highScore: number;
+  highScoreObservable: Observable<number>;
+  highScoreValue: number;
   lines: number;
   level: number;
+
+  @ViewChild('highScore', {
+    static: true
+  }) highScoreRef: ElementRef
+
   moves = {
     [KEY.LEFT]: (p: IPiece): IPiece => ({ ...p, x: p.x - 1 }),
     [KEY.RIGHT]: (p: IPiece): IPiece => ({ ...p, x: p.x + 1 }),
@@ -57,14 +66,19 @@ export class TetrisComponent implements OnInit {
       }
     }
   }
- 
-  constructor(private service: GameService) {}
+
+  constructor(
+    private service: GameService,
+    private scoreServ: ScoreService,
+    public authServ: AuthService,
+  ) { }
 
   ngOnInit() {
     this.initBoard();
     this.initNext();
+    this.highScoreObservable = this.scoreServ.getUserScore(localStorage.username, 'tetris');
+    this.highScoreValue = this.highScoreRef.nativeElement.textContent;
     this.resetGame();
-    this.highScore = 0;
   }
 
   initBoard() {
@@ -114,6 +128,8 @@ export class TetrisComponent implements OnInit {
     this.time = { start: 0, elapsed: 0, level: LEVEL[this.level] };
     this.paused = false;
     this.addOutlines();
+    console.log(this.authServ.userData);
+    this.scoreServ.updateScore(this.authServ.userData.uid, 'tetris', this.highScoreValue);
   }
 
   animate(now = 0) {
@@ -183,7 +199,7 @@ export class TetrisComponent implements OnInit {
     });
   }
 
-  private add3D(x:   number, y: number, color: number): void {
+  private add3D(x: number, y: number, color: number): void {
     //Darker Color
     this.ctx.fillStyle = COLORSDARKER[color];
     // Vertical
@@ -211,17 +227,17 @@ export class TetrisComponent implements OnInit {
     this.ctx.fillRect(x, y, .05, 1);
     this.ctx.fillRect(x, y, .1, .95);
     // Horizontal
-    this.ctx.fillRect(x, y, 1 , .05);
+    this.ctx.fillRect(x, y, 1, .05);
     this.ctx.fillRect(x, y, .95, .1);
   }
-  
+
   private addOutlines() {
-    for(let index = 1; index < COLS; index++) {
+    for (let index = 1; index < COLS; index++) {
       this.ctx.fillStyle = 'black';
       this.ctx.fillRect(index, 0, .025, this.ctx.canvas.height);
     }
 
-    for(let index = 1; index < ROWS; index++) {
+    for (let index = 1; index < ROWS; index++) {
       this.ctx.fillStyle = 'black';
       this.ctx.fillRect(0, index, this.ctx.canvas.width, .025);
     }
@@ -258,7 +274,7 @@ export class TetrisComponent implements OnInit {
   gameOver() {
     this.gameStarted = false;
     cancelAnimationFrame(this.requestId);
-    this.highScore = this.points > this.highScore ? this.points : this.highScore;
+    this.highScoreValue = this.points > this.highScoreValue ? this.points : this.highScoreValue;
     this.ctx.fillStyle = 'black';
     this.ctx.fillRect(1, 3, 8, 1.2);
     this.ctx.font = '1px Arial';
