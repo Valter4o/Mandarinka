@@ -24,8 +24,11 @@ export class PacmanComponent implements OnInit {
   readonly PACMAN: number = 5;
   readonly ROAD: number = 2;
   readonly COIN: number = 1;
+  readonly COIN_VALUE: number = 10;
   readonly BIG_COIN: number = 4;
-  readonly EAT_TIMER: number = 2000;
+  readonly BIG_COIN_VALUE: number = 50;
+  readonly EAT_TIMER: number = 20;
+  readonly GHOST_VALUE: number = 200;
 
   totalScore: number = 0;
   interval: any;
@@ -34,7 +37,7 @@ export class PacmanComponent implements OnInit {
 
   //Pacman
   public pacman: IPacman = {
-    dir: 'left',
+    dir: 'up',
     marker: 5,
   }
 
@@ -116,6 +119,7 @@ export class PacmanComponent implements OnInit {
   }
 
   newGame() {
+    this.changeEatable(this.ghostArr, false);
     this.dialog.closeAll();
     this.gameMap = JSON.parse(JSON.stringify(this.services.map));
     let map = this.gameMap;
@@ -262,7 +266,7 @@ export class PacmanComponent implements OnInit {
     const ghostMerkersArr: number[] = [6, 7, 8, 9]
     //Going in ghost(eatable)
     if (val === 10) {
-      this.totalScore += 50;
+      this.totalScore += this.GHOST_VALUE;
       this.pacmanEatsGhost(
         //Finding which ghost we eat
         this.ghostArr.find((ghost) => {
@@ -280,12 +284,12 @@ export class PacmanComponent implements OnInit {
 
     //Going in normal coin
     if (val === this.COIN) {
-      this.totalScore += this.COIN;
+      this.totalScore += this.COIN_VALUE;
       this.coinsCount--;
     }
     //Going in BIG coin
     if (val === this.BIG_COIN) {
-      this.totalScore += this.BIG_COIN;
+      this.totalScore += this.BIG_COIN_VALUE;
       this.ghostEatableTimer = this.EAT_TIMER;
       this.changeEatable(this.ghostArr, true);
       this.bigCoinsCount--;
