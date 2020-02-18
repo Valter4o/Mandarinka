@@ -4,4 +4,5 @@ export interface IPlayerScore {
   pacman: number;
   tetris: number;
   bonus: number;
+  total?: number;
 }

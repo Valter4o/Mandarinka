@@ -41,7 +41,6 @@ export class AuthService {
           const username = (data.payload.data() as any).username;
           localStorage.setItem('username', username);
           this.score.createUser(username, uid);
-          // this.score.getScores();
         })
         this.ngZone.run(() => {
           this.router.navigate(['home']);

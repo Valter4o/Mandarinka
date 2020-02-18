@@ -8,4 +8,5 @@ table {
 
 .container{
     height: 60%;
-}
+    background-image: url(/assets/images-leaderboard/background.jpg);
+} 
