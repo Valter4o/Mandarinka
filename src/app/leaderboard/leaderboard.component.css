@@ -5,3 +5,7 @@ table {
 * {
     font-family: 'Press Start 2P', cursive;
 }
+
+.container{
+    height: 60%;
+}

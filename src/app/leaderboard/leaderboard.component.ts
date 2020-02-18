@@ -1,6 +1,6 @@
-import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IPlayerScore } from "./interfaces/PlayerScore";
-import { ScoreService } from '../games/shared/score.service';
+import { ScoreService } from '../shared/score.service';
 import { Observable } from 'rxjs';
 
 @Component({
