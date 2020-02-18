@@ -1,0 +1,16 @@
+ * {
+     font-family: 'Press Start 2P', cursive;
+ }
+
+ .container {
+     margin-bottom: 20px;
+     background-color:green;
+ }
+
+ h2 {
+     margin-left: 30%;
+ }
+
+ table {
+    width: 100%;
+}

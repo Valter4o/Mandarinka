@@ -1,0 +1,37 @@
+<div class='container'>
+    <h2>Top players</h2>
+    <table mat-table [dataSource]="dataSource | async" class="mat-elevation-z8">
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    
+        <!-- Name Column   -->
+        <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef> Username </th>
+            <td mat-cell *matCellDef="let element"> {{element.username}} </td>
+        </ng-container>
+    
+        // Sudoku Column
+        <ng-container matColumnDef="sudoku">
+            <th mat-header-cell *matHeaderCellDef> Sudoku </th>
+            <td mat-cell *matCellDef="let element"> {{element.sudoku}} </td>
+        </ng-container>
+    
+        // Pacman Column 
+        <ng-container matColumnDef="pacman">
+            <th mat-header-cell *matHeaderCellDef> Pacman </th>
+            <td mat-cell *matCellDef="let element"> {{element.pacman}} </td>
+        </ng-container>
+    
+        // Tetris Column
+        <ng-container matColumnDef="tetris">
+            <th mat-header-cell *matHeaderCellDef> Tetris </th>
+            <td mat-cell *matCellDef="let element"> {{element.tetris}} </td>
+        </ng-container>
+    
+        // BonusGame Column
+        <ng-container matColumnDef="bonus">
+            <th mat-header-cell *matHeaderCellDef> Bonus Game </th>
+            <td mat-cell *matCellDef="let element"> {{element.bonus}} </td>
+        </ng-container>
+    </table>
+</div>
