@@ -70,7 +70,7 @@ export class TetrisComponent implements OnInit {
   constructor(
     private service: GameService,
     private scoreServ: ScoreService,
-    public authServ: AuthService,
+    private authServ: AuthService,
   ) { }
 
   ngOnInit() {
