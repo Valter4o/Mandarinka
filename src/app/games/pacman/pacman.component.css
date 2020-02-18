@@ -1,6 +1,6 @@
-.main-container {
-    margin-left: 500px;
-    justify-content: center;
+.container {
+    padding-left: 350px;
+    background-image: url('/assets/images-pacman/images/background.jpg');
 }
 
 .block {
@@ -8,7 +8,6 @@
     height: 25px;
     display: inline-block;
     margin: -2px -2px -2px 2px;
-    /* background-color: rgba(119, 13, 13, 0.926); brown */
     background-color: black;
 }
 

@@ -3,7 +3,7 @@
         <ul>
             <li (click)='showDetails()'><span>SHOW RULES</span></li>
             <li (click)='getRandomGame()'><span>GENERATE LEVEL</span></li>
-            <li><span>HIGH SCORE: {{highScore|async}}</span></li>
+            <li (click)='addScore()'><span>HIGH SCORE: <a #highScore>{{highScoreObservable|async}}</a></span></li>
             <li (click)='clear()'><span>CLEAR BOARD</span></li>
             <li (click)='check()'><span>KILL IT</span></li>
         </ul>

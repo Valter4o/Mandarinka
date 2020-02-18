@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { ICell } from "./interfaces/cell";
 import { ICellLocation } from "./interfaces/CellLocation";
 import { MatDialog } from "@angular/material/dialog";
@@ -7,7 +7,9 @@ import { Rules } from './popups/rules/rules.component';
 import { NotfinishedComponent } from './popups/game/notfinished/notfinished.component';
 import { LostComponent } from './popups/game/finished/lost/lost.component';
 import { WonComponent } from './popups/game/finished/won/won.component';
- 
+import { ScoreService } from "../../shared/score.service";
+import { AuthService } from '../../auth/authentication.service';
+
 @Component({
   selector: "app-sudo-ku",
   templateUrl: "./sudo-ku.component.html",
@@ -43,6 +45,10 @@ export class SudoKuComponent implements OnInit {
   public creator: string;
   private gameDbId: string;
 
+  @ViewChild('highScore', { static: true }) highScoreRef: ElementRef;
+  public highScoreValue: number;
+  private highScoreObservable: any;
+
   // private testGame: Array<Array<number>> = [
   //   [8, 1, 5, 3, 4, 2, 6, 9, 7],
   //   [2, 3, 6, 8, 7, 9, 4, 5, 1],
@@ -57,12 +63,22 @@ export class SudoKuComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private service: SudokuServiceService
+    private service: SudokuServiceService,
+    private scoreServ: ScoreService,
+    private authServ: AuthService,
   ) {
   }
 
   ngOnInit() {
     this.showDetails();
+    this.highScoreObservable = this.scoreServ.getUserScore(localStorage.username, 'sudoku');
+    this.highScoreValue = +this.highScoreRef.nativeElement.textContent;
+  }
+
+  addScore() {
+    this.highScoreValue += 10;
+    this.scoreServ.updateScore(this.authServ.userData.uid, 'sudoku', this.highScoreValue);
+    this.highScoreRef.nativeElement.textContent = this.highScoreValue;
   }
 
   //ADDING NUMBER

@@ -4,7 +4,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { LostBonusComponent } from './popups/lost-bonus/lost-bonus.component';
 import { WonBonusComponent } from './popups/won-bonus/won-bonus.component';
 import { ScoreService } from '../../shared/score.service';
-import { map, tap, mapTo } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../auth/authentication.service';
 
 @Component({
   selector: 'app-bonus-game',
@@ -13,7 +14,7 @@ import { map, tap, mapTo } from 'rxjs/operators';
 })
 export class BonusGameComponent implements OnInit, OnDestroy {
   counter: any = 0;
-  highScoreObservable: any;
+  highScoreObservable: Observable<number>;
   table: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
   indexes: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   history: string[] = [];
@@ -24,7 +25,8 @@ export class BonusGameComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    public scoreService: ScoreService
+    public scoreService: ScoreService,
+    private authServ: AuthService,
   ) { }
 
   ngOnInit(): void {
@@ -43,8 +45,10 @@ export class BonusGameComponent implements OnInit, OnDestroy {
   }
 
   updateScore() {
-    const uid = JSON.parse(localStorage.user).uid;
-    this.scoreService.updateScore(uid, 'bonus', this.highScoreValue)
+    if (this.highScoreValue === this.counter) {
+      const uid = this.authServ.userData.uid;
+      this.scoreService.updateScore(uid, 'bonus', this.counter);
+    }
   }
 
   rulesHandler() {
@@ -58,9 +62,7 @@ export class BonusGameComponent implements OnInit, OnDestroy {
       if (this.nextBoxes.includes(boxId) || this.counter === 0) {
         this.counter++;
         if (this.counter > this.highScoreValue) {
-          this.highScoreObservable.pipe(
-            mapTo(this.counter)
-          )
+          this.highScoreRef.nativeElement.textContent = this.counter;
         }
         const h4 = document.createElement('h4');
         h4.textContent = this.counter;

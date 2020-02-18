@@ -1,7 +1,8 @@
-<div class="main-container">
-  <section class="game-section">
-    <div class="row" *ngFor=" let row of gameMap; let i = index ">
-      <div class="block" *ngFor=" let block of row; let j = index " [ngClass]="{
+<div class='container'>
+  <div class="main-container">
+    <section class="game-section">
+      <div class="row" *ngFor=" let row of gameMap; let i = index ">
+        <div class="block" *ngFor=" let block of row; let j = index " [ngClass]="{
           	'wall' : block === WALL,
             'coin' : block === COIN,
             'road' : block === ROAD,
@@ -25,7 +26,8 @@
               )
             ) : '' 
           }"></div>
-    </div>
-  </section>
+      </div>
+    </section>
+  </div>
+  <h1>Total Score {{totalScore}} Highest Score: <span #highScore>0</span></h1>
 </div>
-<h1>Total Score {{totalScore}}</h1>

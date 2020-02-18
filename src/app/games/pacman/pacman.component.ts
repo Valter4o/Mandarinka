@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { PacmanService } from './services/pacman.service';
 import { MatDialog } from '@angular/material/dialog';
 import { StartGameComponent } from './popups/start-game/start-game.component';
@@ -6,6 +6,8 @@ import { PacmanDieComponent } from './popups/pacman-die/pacman-die.component';
 import { IGhost } from './interfaces/ghost';
 import { IPacman } from './interfaces/pacman';
 import { PacmanWinComponent } from './popups/pacman-win/pacman-win.component';
+import { ScoreService } from '../../shared/score.service';
+import { AuthService } from '../../auth/authentication.service';
 
 
 @Component({
@@ -34,6 +36,9 @@ export class PacmanComponent implements OnInit {
   interval: any;
   coinsCount: number = 0;
   bigCoinsCount: number = 0;
+  @ViewChild('highScore', { static: true }) highestScoreRef: ElementRef;
+  highScoreValue: number;
+  lostGame: boolean = false;
 
   //Pacman
   public pacman: IPacman = {
@@ -88,10 +93,13 @@ export class PacmanComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private services: PacmanService
+    private services: PacmanService,
+    private scoreServ: ScoreService,
+    private authServ: AuthService,
   ) { }
 
   ngOnInit(): void {
+    this.highScoreValue = this.highestScoreRef.nativeElement.textContent;
     this.newGame();
   }
 
@@ -119,6 +127,12 @@ export class PacmanComponent implements OnInit {
   }
 
   newGame() {
+    if (this.totalScore > this.highScoreValue && this.lostGame) {
+      this.highestScoreRef.nativeElement.textContent = this.totalScore;
+      this.highScoreValue = this.totalScore;
+      this.scoreServ.updateScore(this.authServ.userData.uid, 'pacman', this.totalScore);
+    }
+    this.totalScore = 0;
     this.changeEatable(this.ghostArr, false);
     this.dialog.closeAll();
     this.gameMap = JSON.parse(JSON.stringify(this.services.map));
@@ -338,6 +352,7 @@ export class PacmanComponent implements OnInit {
   }
 
   ghostEatsPacman(): void {
+    this.lostGame = true;
     clearInterval(this.interval);
     const ref = this.dialog.open(PacmanDieComponent, {});
     ref.componentInstance.onClose.subscribe((_) => {
