@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentReference, DocumentChangeAction } from '@angular/fire/firestore';
 import { ICell } from "../interfaces/cell";
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,11 @@ export class SudokuServiceService {
     private firestore: AngularFirestore
   ) { }
 
-  postGame(game: Array<Array<ICell>>, username: string) {
+  postGame(game: Array<Array<ICell>>, username: string):Promise<DocumentReference> {
     return this.firestore.collection('games').add({ username, game: JSON.stringify(game) });
   }
 
-  getGame(){
+  getGame():Observable<DocumentChangeAction<ICell>[]>{
     return this.firestore.collection('games').snapshotChanges();
   }
 }
