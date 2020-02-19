@@ -78,7 +78,7 @@ export class BonusGameComponent implements OnInit, OnDestroy {
           this.dialog.open(WonBonusComponent)
         }
 
-        if (this.nextBoxes.length === 0) {
+        if (this.nextBoxes.length === 0 && this.counter < 100) {
           const dialogRef = this.dialog.open(LostBonusComponent);
           const sub = dialogRef.componentInstance.onClose.subscribe((type) => {
             if (type === 'refresh') {
