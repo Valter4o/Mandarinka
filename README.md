@@ -50,4 +50,4 @@ No tests yet
 
 ## Acknowledgments
 
-* To Iliq Idakiev and Kiril Kirilov, who helped a lot.
+* To Iliq Idakiev, who helped a lot.
