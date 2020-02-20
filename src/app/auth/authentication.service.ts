@@ -107,7 +107,6 @@ export class AuthService {
           const username = (data.payload.data() as any).username;
           localStorage.setItem('username', username);
           this.score.createUser(username, result.user.uid);
-          // this.score.getScores();
         })
       }).catch((error) => {
         window.alert(error)
